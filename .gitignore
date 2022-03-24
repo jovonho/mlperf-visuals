@@ -2,12 +2,9 @@
 __pycache__/
 
 data/*.out
-data/*.log
 data/*_data/
 data/*_data_*/
 *.out
 *.log
-data/plots/*.svg
-data/plots/*.png
 data/writes/
 notes/

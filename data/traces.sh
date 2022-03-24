@@ -43,7 +43,7 @@ while read pid; do
 
     # Block IO trace
     # Extract the pid's lines from the trace, remove less relevant columns
-    # We're keepin only timestamp, pid, r/w, sector, req size, latency.
+    # We're keeping only timestamp, pid, r/w, sector, req size, latency.
     grep -a " $pid " bio_python.out | awk -F '\\s+' '{print $1,$2,$7,$8,$9,$10}' > "bio_data/bio_$pid"
     # Note: Need spaces in the grep else we get random lines where timestamp matches the pid 
 
@@ -57,3 +57,12 @@ while read pid; do
     grep -a " $pid " vfs_rw_time_aligned.out | awk -F ' ' '{print $1,$2,$4,$5,$6,$7,$8}' > "vfsrw_data/vfsrw_$pid"
 
 done < ./unique_pids
+
+# Create a big merged traces file as well (will be useful for aligning the nsecs since boot timestamps with local time)
+
+
+tail -n+3 bio.out >> comb.out
+tail -n+3 open.out >> comb.out
+tail -n+3 vfs_rw.out >> comb.out
+sort comb.out >> combined.out
+rm comb.out

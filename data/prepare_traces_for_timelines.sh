@@ -33,7 +33,7 @@ while read pid; do
     cat bio_tmp open_tmp vfsopen_tmp vfsrw_tmp > $outfile
     sort -o $outfile $outfile
 
-    # cp $outfile qc_check_$pid
+    # cp $outfile qa_check_$pid
 
     # Transform timestamps and latency into start and end dates for plotting
     py ts_to_start_end.py $outfile

@@ -6,6 +6,8 @@ def main():
     """
     Convert raw cpu usage data to a csv file
     """
+    # Change this
+    current_date = "2022-02-05"
 
     infile = open("data/cpu_data/cpu.all", "r")
     outcsv = open("data/cpu_data/cpu_all.csv", "w")
@@ -27,7 +29,6 @@ def main():
     outcsv.write(",".join(headers) + "\n")
 
     date_changed = False
-    current_date = "2022-02-05"
 
     for line in infile:
         # Remove duplicate spaces, and split

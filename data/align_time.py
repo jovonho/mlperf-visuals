@@ -2,7 +2,7 @@ import numpy as np
 
 
 def main():
-    # Obtained from previous analysis
+    # Obtained from previous analysis (see align_time_README.md)
     ref_ts = 1380360127458684
     # Add 5h to convert from EST to UTC
     ref_t = np.datetime64("2022-02-05T15:28:13.000000000") + np.timedelta64(5, "h")

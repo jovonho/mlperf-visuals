@@ -909,10 +909,10 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
 
     # TODO: Calculate the sort of timescale we're plotting and choose appropriate limits
     # Set the x axis limits
-    ax.set_xlim(
-        df.start_date.min() - np.timedelta64(10, "s"),
-        df.end_date.max() + np.timedelta64(10, "s"),
-    )
+    # ax.set_xlim(
+    #     df.start_date.min() - np.timedelta64(10, "s"),
+    #     df.end_date.max() + np.timedelta64(10, "s"),
+    # )
 
     # Format the y-ticks
     ax.set_yticks(range(len(categories)))
@@ -957,8 +957,16 @@ if __name__ == "__main__":
     # )
 
     # Main overall plot
+    # plot_pids_timeline_cpu_gpu(
+    #     outname="timelines2/all",
+    # )
+
+    # 2022-02-05T20:27:58.923748149,2022-02-05T20:27:57.494517123,VFSR
+
     plot_pids_timeline_cpu_gpu(
-        outname="timelines2/all",
+        start="2022-02-05T20:27:57",
+        end="2022-02-05T20:27:59",
+        outname="timelines/test",
     )
 
     # # 3 Zoom plots into the first 5 min, 30min of training only phase and 30min of eval phase

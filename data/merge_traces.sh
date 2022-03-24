@@ -1,15 +1,8 @@
 #!/bin/bash
 
-if [[ $# -eq 3 ]]; 
-then
-    out="combined.out"
-else
-    out=$4
-fi
-
-tail -n+3 $1 >> comb.out
-tail -n+3 $2 >> comb.out
-tail -n+3 $3 >> comb.out
-tail -n+3 $4 >> comb.out
-sort comb.out >> $5
+# Hardcoded to merge the 3 traces
+tail -n+3 bio.out >> comb.out
+tail -n+3 open.out >> comb.out
+tail -n+3 vfs_rw.out >> comb.out
+sort comb.out >> combined.out
 rm comb.out
