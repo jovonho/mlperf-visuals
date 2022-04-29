@@ -22,7 +22,7 @@ def process_timeline():
 
     for i, log in enumerate(all_logs):
 
-        ux_time = np.datetime64(log["time_ms"], "ms")
+        ux_time = np.datetime64(log["time_ms"], "ms") + np.timedelta64(5, "h")
 
         key_parts = log["key"].split("_")
 
@@ -62,4 +62,5 @@ def process_vals():
 
 
 if __name__ == "__main__":
+    process_timeline()
     process_vals()

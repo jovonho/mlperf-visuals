@@ -1,5 +1,6 @@
 .venv/
 __pycache__/
+plots/
 
 data/*.out
 data/*_data/

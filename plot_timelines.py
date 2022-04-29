@@ -3,56 +3,9 @@ from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colo
 import numpy as np
 import pandas as pd
 from collections import defaultdict
+import os.path
 
-
-def plot_barcode():
-
-    code_len = 100
-    pixel_per_bar = 8
-    dpi = 300
-
-    fig, axes = plt.subplots(
-        nrows=3, ncols=1, sharex=True, figsize=(code_len * pixel_per_bar / dpi, 0.5), dpi=dpi
-    )
-
-    second_color = ["red", "orange", "purple"]
-
-    for i, ax in enumerate(axes):
-        code = np.random.choice([0, 1], size=(100,))
-        ax.get_yaxis().set_visible(False)
-        cmap = colors.ListedColormap(["white", second_color[i]])
-        ax.imshow(code.reshape(1, -1), cmap=cmap, aspect="auto", interpolation="nearest")
-
-    plt.show()
-
-
-def plot_evts():
-
-    matplotlib.rcParams["font.size"] = 8.0
-
-    # Fixing random state for reproducibility
-    np.random.seed(19680801)
-
-    # create random data
-    data1 = np.random.random([1, 50])
-    print(data1)
-    print(data1[0])
-
-    # set different colors for each set of positions
-    colors1 = ["C{}".format(i) for i in range(data1.shape[0])]
-
-    # set different line properties for each set of positions
-    # note that some overlap
-    lineoffsets1 = np.array([-15, -3, 1, 1.5, 6, 10])
-    linelengths1 = [5, 2, 1, 1, 3, 1.5]
-
-    fig, axs = plt.subplots()
-
-    # create a horizontal plot
-    axs.eventplot(data1, colors=colors1)
-
-    plt.show()
-
+DATA_DIR = "data/timeline_data/4gpu_baseline"
 
 def plot_thread(pid):
 
@@ -88,7 +41,7 @@ def plot_thread(pid):
     masks = {
         "BIO": (df["event"] == "BIOR") | (df["event"] == "BIOW"),
         "OPEN": (df["event"] == "OPENAT") | (df["event"] == "VFSOPEN"),
-        "VFS": (df["event"] == "VFSR") | (df["event"] == "VFSW"),
+        "R/W": (df["event"] == "READ") | (df["event"] == "WRITE"),
     }
 
     # Plot the events
@@ -298,7 +251,7 @@ def plot_threads_w_timeline():
         masks = {
             "BIO": (df["event"] == "BIOR") | (df["event"] == "BIOW"),
             "OPEN": (df["event"] == "OPENAT") | (df["event"] == "VFSOPEN"),
-            "VFS": (df["event"] == "VFSR") | (df["event"] == "VFSW"),
+            "R/W": (df["event"] == "READ") | (df["event"] == "WRITE"),
         }
 
         ax = axs[i]
@@ -442,12 +395,11 @@ def plot_timeline_cpu_gpu(start=None, end=None, outname=None):
 
     bar_height = 1
     ymins = [0, 1, 2]
-    categories = ["BIO", "VFS", "OPEN"]
+    categories = ["BIO", "R/W", "OPEN"]
     colors_dict = dict(
         OPENAT="purple",
-        VFSOPEN="slateblue",
-        VFSR="dodgerblue",
-        VFSW="red",
+        READ="dodgerblue",
+        WRITE="red",
         BIOR="darkorange",
         BIOW="red",
     )
@@ -644,30 +596,15 @@ def plot_timeline_cpu_gpu(start=None, end=None, outname=None):
     plt.savefig(f"./plots/{filename}.png", format="png", dpi=600)
 
 
-def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
-
-    pids = [
-        "1313298",
-        "1313302",
-        "1313336",
-        "1313402",
-        "1313403",
-        "1313404",
-        "1313405",
-        "1313406",
-        "1313407",
-        "1313408",
-        "1313409",
-    ]
+def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, margin=np.timedelta64(60, "s"), filename=None):
 
     bar_height = 1
     ymins = [0, 1, 2]
-    categories = ["BIO", "VFS", "OPEN"]
+    categories = ["BIO", "R/W", "OPEN"]
     colors_dict = dict(
         OPENAT="purple",
-        VFSOPEN="slateblue",
-        VFSR="dodgerblue",
-        VFSW="red",
+        READ="dodgerblue",
+        WRITE="red",
         BIOR="blue",
         BIOW="red",
     )
@@ -684,7 +621,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
     # Plot CPU
     #
     df = pd.read_csv(
-        f"data/cpu_data/cpu_all.csv",
+        os.path.join(DATA_DIR, "cpu_data/cpu_all.csv"),
         sep=",",
     )
     df["timestamp"] = pd.to_datetime(df["timestamp"])
@@ -694,9 +631,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
         df = df[df["timestamp"] < np.datetime64(end)]
 
     ax = axs[0]
-
     ax.set_title("CPU Usage")
-
     ax.set_ylabel("percent utilisation(%)")
 
     # There are more fields available but weren't very interesting
@@ -727,7 +662,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
     #
     # Plot GPU
     #
-    df = pd.read_csv(f"./data/gpu_data/gpu_avg.csv", sep=",")
+    df = pd.read_csv(os.path.join(DATA_DIR, "gpu_data/gpu_avg.csv"), sep=",")
     df["timestamp"] = pd.to_datetime(df["timestamp"])
 
     if start is not None:
@@ -736,9 +671,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
         df = df[df["timestamp"] < np.datetime64(end)]
 
     ax1 = axs[1]
-
     ax1.set_title("GPU Usage")
-
     ax1.set_ylabel("percent utilisation(%)")
 
     ax1.plot(
@@ -792,7 +725,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
         print(f"Processing pid {pid}")
 
         df = pd.read_csv(
-            f"data/st_end_data/st_end_data_{pid}", names=["start_date", "end_date", "event"]
+            os.path.join(DATA_DIR, f"st_end_data/st_end_data_{pid}"), names=["start_date", "end_date", "event"]
         )
         df = df[["start_date", "end_date", "event"]]
         df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
@@ -806,48 +739,43 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
         # Can't define this earlier
         masks = {
             "BIO": (df["event"] == "BIOR") | (df["event"] == "BIOW"),
-            "OPEN": (df["event"] == "OPENAT") | (df["event"] == "VFSOPEN"),
-            "VFS": (df["event"] == "VFSR") | (df["event"] == "VFSW"),
+            "OPEN": (df["event"] == "OPENAT") ,
+            "R/W": (df["event"] == "READ") | (df["event"] == "WRITE"),
         }
 
         ax = axs[i + 2]
-        ax.set_title(f"{pid}")
+        if pid in pid_names:
+            title = pid_names[pid] 
+        else:
+            title = pid
+
+        ax.set_title(f"{title}")
 
         # Plot the events
         for j, category in enumerate(categories):
             mask = masks[category]
             start_dates = mdates.date2num(df.loc[mask].start_date)
             end_dates = mdates.date2num(df.loc[mask].end_date)
-            # Could increase bar width by rounding up durations to nearest ms or such
             durations = end_dates - start_dates
             xranges = list(zip(start_dates, durations))
             ymin = ymins[j] - 0.5
             yrange = (ymin, bar_height)
             colors = [colors_dict[event] for event in df.loc[mask].event]
             ax.broken_barh(xranges, yrange, facecolors=colors, alpha=1)
-            # you can set alpha to 0.6 to check if there are some overlaps
 
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         ax.spines["left"].set_visible(False)
 
-        ax.grid(True, axis="x", linestyle="--", linewidth=0.45, alpha=0.2, color="grey")
+        ax.grid(True, axis="both", linestyle="--", linewidth=0.45, alpha=0.2, color="grey")
         ax.tick_params(which="both", direction="in")
-
-        # Format the x-ticks
-        ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=100))
-        ax.xaxis.set_major_formatter(
-            mdates.DateFormatter(
-                "%H:%M:%S",
-            )
-        )
 
         # Format the y-ticks
         ax.set_yticks(range(len(categories)))
         ax.set_yticklabels(categories)
 
         # Add the legend
-        if i == 4:
+        if i == 3:
             patches = [
                 mpatches.Patch(color=color, label=key) for (key, color) in colors_dict.items()
             ]
@@ -858,7 +786,7 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
     #
     print(f"Processing timeline")
 
-    df = pd.read_csv("data/mllog_data/timeline.csv", names=["start_date", "end_date", "event"])
+    df = pd.read_csv(os.path.join(DATA_DIR, "mllog_data/timeline.csv"), names=["start_date", "end_date", "event"])
 
     df = df[["start_date", "end_date", "event"]]
     df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
@@ -900,19 +828,20 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
     # TODO: Calculate the sort of timescale we're plotting and choose appropriate limits
     # Format the x-ticks
     ax.xaxis.set_major_locator(mdates.AutoDateLocator(maxticks=100))
-    ax.xaxis.set_major_formatter(
-        mdates.DateFormatter(
-            "%b %d %H:%M",
+    ax.xaxis.set_major_formatter(mdates.DateFormatter(
+            "%H:%M",
             # "%H:%M:%S.%f",
-        )
-    )
+    ))
 
     # TODO: Calculate the sort of timescale we're plotting and choose appropriate limits
     # Set the x axis limits
-    # ax.set_xlim(
-    #     df.start_date.min() - np.timedelta64(10, "s"),
-    #     df.end_date.max() + np.timedelta64(10, "s"),
-    # )
+    if margin is None:
+        margin = np.timedelta64(60, "s")
+
+    ax.set_xlim(
+        df.start_date.min() - margin,
+        df.end_date.max() + margin,
+    )
 
     # Format the y-ticks
     ax.set_yticks(range(len(categories)))
@@ -923,10 +852,10 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
 
     print("Saving figure")
 
-    fig.suptitle("MLCommons Image Segmentation")
+    fig.suptitle(title)
 
-    if outname is not None:
-        filename = outname
+    if filename is not None:
+        filename = filename
     else:
         filename = "timelines/cpu_gpu_timeline"
 
@@ -935,54 +864,49 @@ def plot_pids_timeline_cpu_gpu(start=None, end=None, outname=None):
 
 if __name__ == "__main__":
 
-    # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T20:27:44.44",
-    #     end="2022-02-05T20:27:44.5",
-    #     outname="timelines/336_dev_shm_writing",
-    # )
-    # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T20:27:49",
-    #     end="2022-02-05T20:27:50",
-    #     outname="timelines/all_202749_202750",
-    # )
-    # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T20:27:45",
-    #     end="2022-02-05T20:27:50",
-    #     outname="timelines/all_202745_202750",
-    # )
-    # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T20:27:53",
-    #     end="2022-02-05T20:27:54",
-    #     outname="timelines/all_202753_202754",
-    # )
+    DATA_DIR = "data/timeline_data/4gpu_baseline"
 
-    # Main overall plot
+    pids = [
+        # "32260",       # Possibly just loading the mllog library
+        # "32261",
+        "32263",        # Main process
+        # "32264",
+        "32296",        # Multiprocessing resource tracker
+        "32297",        # Workers 
+        "32298",
+        "32299",
+        "32300",
+    ]
+
+    pid_names = {
+        "32263": "master process",
+        "32296": "resource tracker", 
+        "32297": "worker 1",        
+        "32298": "worker 2",
+        "32299": "worker 3",
+        "32300": "worker 4",
+    }
+
     # plot_pids_timeline_cpu_gpu(
-    #     outname="timelines2/all",
-    # )
-
-    # 2022-02-05T20:27:58.923748149,2022-02-05T20:27:57.494517123,VFSR
-
-    plot_pids_timeline_cpu_gpu(
-        start="2022-02-05T20:27:57",
-        end="2022-02-05T20:27:59",
-        outname="timelines/test",
-    )
-
-    # # 3 Zoom plots into the first 5 min, 30min of training only phase and 30min of eval phase
-    # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T20:27:30",
-    #     end="2022-02-05T20:32:30",
-    #     outname="timelines2/all_first5min",
+    #     pids, pid_names,
+    #     title="MLCommons Image Segmentation - 4 GPUs Baseline",
+    #     filename="timelines/4gpu_baseline",
     # )
 
     # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-05T21:00:00",
-    #     end="2022-02-05T21:30:00",
-    #     outname="timelines2/all_30min_phase1",
+    #     pids, pid_names,
+    #     title="MLCommons Image Segmentation - 4 GPUs Baseline - First 5 Minutes",
+    #     start="2022-04-29T18:15:30",
+    #     end="2022-04-29T18:20:30",
+    #     margin=np.timedelta64(15, "s"),
+    #     filename="timelines/4gpu_baseline_first5min",
     # )
+
     # plot_pids_timeline_cpu_gpu(
-    #     start="2022-02-06T01:45:00",
-    #     end="2022-02-06T02:15:00",
-    #     outname="timelines2/all_30min_phase2",
+    #     pids, pid_names,
+    #     title="MLCommons Image Segmentation - 4 GPUs Baseline - First Evaluation Period",
+    #     start="2022-04-29T18:30:30",
+    #     end="2022-04-29T18:33:30",
+    #     margin=np.timedelta64(5, "s"),
+    #     filename="timelines/4gpu_baseline_firsteval",
     # )
