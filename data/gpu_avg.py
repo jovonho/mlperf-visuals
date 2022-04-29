@@ -1,23 +1,30 @@
-from itertools import zip_longest as izip_longest
-from statistics import mean
+import os
+import argparse
 import numpy as np
+from statistics import mean
+from itertools import zip_longest as izip_longest
 
+NUM_GPUS = 4
 
 def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return izip_longest(*args, fillvalue=fillvalue)
 
 
-def main():
-    infile = open("data/gpu_data/gpu.raw", "r")
-    outcsv = open("data/gpu_data/gpu_avg.csv", "w")
+def main(gpu_trace):
+
+    data_dir = os.path.dirname(gpu_trace)
+
+    infile = open(gpu_trace, "r")
+    outcsv = open(os.path.join(data_dir, "gpu_avg.csv"), "w")
 
     # Print headers
     headers = ["timestamp", "sm", "mem", "fb"]
     outcsv.write(",".join(headers) + "\n")
 
-    # Read the file 8 by 8, compute the average for all columns and write out
-    for line_batch in grouper(infile, 8):
+    # Read the file NUM_GPUS x NUM_GPUS lines at a time. 
+    # Compute the average for all columns and write out
+    for line_batch in grouper(infile, NUM_GPUS):
 
         # Hold column values we care about
         wcols = []
@@ -49,4 +56,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    p = argparse.ArgumentParser(description="Calculates the average GPU usage from an nvidia-smi trace. Outputs a CSV file.")
+    p.add_argument("gpu_trace", help="The nvidia-smi trace")
+    args = p.parse_args()
+
+    if not os.path.isfile(args.gpu_trace):
+        print(f"Invalid trace file given")
+        exit(-1) 
+
+    main(args.gpu_trace)

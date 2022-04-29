@@ -1,16 +1,19 @@
-import pandas as pd
+import os
+import argparse
 import numpy as np
 
 
-def main():
+def main(cpu_trace):
     """
     Convert raw cpu usage data to a csv file
     """
     # Change this
-    current_date = "2022-02-05"
+    current_date = "2022-04-29"
 
-    infile = open("data/cpu_data/cpu.all", "r")
-    outcsv = open("data/cpu_data/cpu_all.csv", "w")
+    data_dir = os.path.dirname(cpu_trace)
+
+    infile = open(cpu_trace, "r")
+    outcsv = open(os.path.join(data_dir, "cpu_all.csv"), "w")
 
     # Print headers
     headers = [
@@ -51,4 +54,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    p = argparse.ArgumentParser(description="Generates a CSV from an mpstat trace of average cpu usage")
+    p.add_argument("cpu_trace", help="The mpstat trace, containing only the lines for 'all'")
+    args = p.parse_args()
+
+    if not os.path.isfile(args.cpu_trace):
+        print(f"Invalid trace file given")
+        exit(-1) 
+
+    main(args.cpu_trace)

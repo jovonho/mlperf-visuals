@@ -5,7 +5,6 @@ import sys
 Fixes the integer overflow bug occuring in VFSRW traces
 """
 
-
 def bugfix(file_to_fix):
 
     infile = open(file_to_fix, "r")
@@ -13,13 +12,13 @@ def bugfix(file_to_fix):
 
     for line in infile:
         cols = line.split(" ")
-        lat = int(cols[3])
+        lat = int(cols[4])
 
         if lat < 0:
             print(f"Bug found: latency of {lat}")
             fix = str(int(str(bin(lat & 0xFFFFFFFF)), 2))
             print(f"\tConverting to {fix}")
-            cols[3] = fix
+            cols[4] = fix
 
         outfile.write(" ".join(cols))
 
