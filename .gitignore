@@ -8,3 +8,5 @@ data/*_data_*/
 *.log
 data/writes/
 notes/
+ckpt_*
+unique_pids
