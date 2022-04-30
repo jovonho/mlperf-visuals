@@ -1,9 +1,8 @@
-﻿import matplotlib
-from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colors
+﻿from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colors
 import numpy as np
 import pandas as pd
-from collections import defaultdict
 import os.path
+import pathlib
 
 DATA_DIR = "data/timeline_data/4gpu_baseline"
 
@@ -884,6 +883,10 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
         filename = filename
     else:
         filename = "timelines/cpu_gpu_timeline"
+    
+    # Create output directory if it doesn't exist
+    output_dir = os.path.dirname(filename)
+    pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     plt.savefig(f"./plots/{filename}.png", format="png", dpi=500)
 
