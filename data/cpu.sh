@@ -2,6 +2,12 @@
 
 # Preproc cpu.out trace into individual CPU trace files
 
+if [ $# -lt 1 ]
+then    
+    echo "Usage: $0 cpu_trace.out"
+    exit -1
+fi
+
 if [[ ! -d ./cpu_data ]]
 then
     echo "Creating output directory cpu_data"

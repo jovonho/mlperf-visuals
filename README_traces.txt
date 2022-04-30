@@ -1,4 +1,4 @@
-Probes/Scripts can be found here (branch DGX1_v2): https://github.com/jovonho/mlperf-traces/tree/dgx1_v2
+Probes/Scripts can be found here (branch awsvm): https://github.com/jovonho/mlperf-traces/tree/awsvm
 
 The versions on github are not the exact ones that generated the traces. I forgot to push the actual versions and have since lost them.
 However, they were mostly the same with differences mostly in the filters used (e.g. tracing only comm=="python" processes for the

@@ -3,11 +3,11 @@ import pathlib
 import numpy as np
 
 # Obtained from previous analysis (see align_time_README.md)
-REF_TIMESTAMP = 71088779970397
-REF_LOCALTIME = np.datetime64("2022-04-29T13:15:31.000000000")
+REF_TIMESTAMP = 75530751851216
+REF_LOCALTIME = np.datetime64("2022-04-29T14:29:33.000000000")
 
-TRACE_DIR = "trace_4gpus_baseline/"
-OUTPUT_DIR = "ta_4gpus_baseline/"
+TRACE_DIR = "trace_4gpus_1xRAM/"
+OUTPUT_DIR = "ta_4gpus_1xRAM/"
 
 def main():
     ref_ts = REF_TIMESTAMP
@@ -19,6 +19,8 @@ def main():
     pathlib.Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
     for trace in traces:
+
+        print(f"Processing {trace}")
 
         infile = open(os.path.join(TRACE_DIR, "trace_" + trace + ".out"), "r")
         outfile = open(os.path.join(OUTPUT_DIR, trace + "_time_aligned.out"), "w")

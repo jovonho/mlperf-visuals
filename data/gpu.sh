@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ $# -lt 1 ]
+then    
+    echo "Usage: $0 gpu_trace.out"
+    exit -1
+fi
+
+
 if [[ ! -d ./gpu_data ]]
 then
     echo "Creating output directory gpu_data"
