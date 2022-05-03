@@ -2,6 +2,7 @@
 __pycache__/
 plots/
 
+data/4gpus_*
 data/*.out
 data/*_data/
 data/*_data_*/
