@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ $# -lt 1 ]
+then
+    echo "Usage: $0 unet3d.log"
+    exit -1
+fi
+
 if [[ ! -d ./mllog_data ]]
 then
     echo "Creating output directory mllog_data"
@@ -7,7 +13,7 @@ then
 fi
 
 # Remove ":::MLLOG" prefix from all ligns
-sed 's/:::MLLOG //' unet3d.log > mllog_data/u.log
+sed 's/:::MLLOG //' $1 > mllog_data/u.log
 
 # Remove empty namespace field
 awk -F ', ' 'BEGIN { OFS= ", "; ORS="\n"} {$1="{"; print $0}' mllog_data/u.log > tmp && mv tmp mllog_data/u.log

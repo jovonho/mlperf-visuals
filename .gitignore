@@ -1,6 +1,8 @@
 .venv/
 __pycache__/
+plots/
 
+data/4gpus_*
 data/*.out
 data/*_data/
 data/*_data_*/
@@ -8,3 +10,5 @@ data/*_data_*/
 *.log
 data/writes/
 notes/
+ckpt_*
+unique_pids

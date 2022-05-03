@@ -14,23 +14,30 @@ while read pid; do
     pid=${pid//[$'\t\r\n']}
     outfile="traces_data/comb_$pid"
 
+    echo "Writing $outfile"
+
     bio="bio_data/bio_$pid"
     open="open_data/open_$pid"
-    vfsopen="vfsopen_data/vfsopen_$pid"
-    vfsrw="vfsrw_data/vfsrw_$pid"
+    read="read_data/read_$pid"
+    write="write_data/write_$pid"
 
 
     # Handle the different traces, we will keep only the timestamp, type and latency here
-    awk -F ' ' '{printf $1","; if ($3=="0") printf "BIOR,"; else printf "BIOW,"; printf $6"\n";}' $bio > bio_tmp
+    echo -e "\tbio"
+    awk -F ' ' '{printf $1","; if ($3=="R") printf "BIOR,"; else printf "BIOW,"; printf $6"\n";}' $bio > bio_tmp
 
-    awk -F ' ' '{printf $1",OPENAT,"$4"\n";}' $open > open_tmp
+    echo -e "\topen"
+    awk -F ' ' '{printf $1",OPENAT,"$3"\n";}' $open > open_tmp
 
-    awk -F ' ' '{printf $1",VFSOPEN,"$4"\n";}' $vfsopen > vfsopen_tmp
+    echo -e "\tread"
+    awk -F ' ' '{printf $1",READ,"$4"\n";}' $read > read_tmp
 
-    awk -F ' ' '{printf $1","; if ($3=="R") printf "VFSR,"; else printf "VFSW,"; printf $4"\n";}' $vfsrw > vfsrw_tmp
+    echo -e "\twrite"
+    awk -F ' ' '{printf $1",WRITE,"$4"\n";}' $write > write_tmp
+
 
     # Merge the traces into one, sort
-    cat bio_tmp open_tmp vfsopen_tmp vfsrw_tmp > $outfile
+    cat bio_tmp open_tmp read_tmp write_tmp > $outfile
     sort -o $outfile $outfile
 
     # cp $outfile qa_check_$pid
@@ -41,4 +48,4 @@ while read pid; do
 done < ./unique_pids
 
 # Cleanup
-rm bio_tmp open_tmp vfsopen_tmp vfsrw_tmp
+rm bio_tmp open_tmp read_tmp write_tmp
