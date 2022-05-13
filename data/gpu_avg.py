@@ -33,16 +33,20 @@ def main(gpu_trace):
         fb = []
 
         for line in line_batch:
-            cols = " ".join(line.split()).replace("-", "0").split(" ")
-            if cols[2] == "0":
-                # Combine cols 0 and 1 into a UTC timestamp
-                ts = f"{cols[0][0:4]}-{cols[0][4:6]}-{cols[0][6:8]}T{cols[1]}"
-                ts = str(np.datetime64(ts) + np.timedelta64(5, "h"))
-                wcols.append(ts)
-            # Extract values
-            sm.append(int(cols[5]))
-            mem.append(int(cols[6]))
-            fb.append(int(cols[9]))
+            try:
+                cols = " ".join(line.split()).replace("-", "0").split(" ")
+                if cols[2] == "0":
+                    # Combine cols 0 and 1 into a UTC timestamp
+                    ts = f"{cols[0][0:4]}-{cols[0][4:6]}-{cols[0][6:8]}T{cols[1]}"
+                    ts = str(np.datetime64(ts) + np.timedelta64(5, "h"))
+                    wcols.append(ts)
+                # Extract values
+                sm.append(int(cols[5]))
+                mem.append(int(cols[6]))
+                fb.append(int(cols[9]))
+            except Exception as e:
+                print(e)
+                print(line)
 
         # Calculate means and append to wcols
         wcols.append(str(mean(sm)))

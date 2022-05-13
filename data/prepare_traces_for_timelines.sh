@@ -1,10 +1,18 @@
 #!/bin/bash
 
-# Create folders to house files
-if [[ ! -d ./traces_data ]]
+if [[ $# -ne 1 ]]
 then
-    echo "Creating output directory traces_data"
-    mkdir traces_data
+    echo "Usage: $0 output_dir"
+    exit -1
+fi
+
+outdir=$1
+
+# Create folders to house files
+if [[ ! -d $outdir/traces_data ]]
+then
+    echo "Creating output directory $outdir/traces_data"
+    mkdir -p $outdir/traces_data
 fi
 
 # For each unique PID, combine the bio, open and vfsrw traces
@@ -12,14 +20,14 @@ fi
 while read pid; do
     # Remove whitespaces and newlines from pid
     pid=${pid//[$'\t\r\n']}
-    outfile="traces_data/comb_$pid"
+    outfile="$outdir/traces_data/comb_$pid"
 
     echo "Writing $outfile"
 
-    bio="bio_data/bio_$pid"
-    open="open_data/open_$pid"
-    read="read_data/read_$pid"
-    write="write_data/write_$pid"
+    bio="$outdir/bio_data/bio_$pid"
+    open="$outdir/open_data/open_$pid"
+    read="$outdir/read_data/read_$pid"
+    write="$outdir/write_data/write_$pid"
 
 
     # Handle the different traces, we will keep only the timestamp, type and latency here

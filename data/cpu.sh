@@ -2,22 +2,19 @@
 
 # Preproc cpu.out trace into individual CPU trace files
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then    
-    echo "Usage: $0 cpu_trace.out"
+    echo "Usage: $0 cpu_trace.out output_dir"
     exit -1
 fi
 
-if [[ ! -d ./cpu_data ]]
+cpu_trace=$1
+output_dir=$2
+
+if [[ ! -d $output_dir/cpu_data ]]
 then
-    echo "Creating output directory cpu_data"
-    mkdir cpu_data
+    echo "Creating output directory $output_dir/cpu_data"
+    mkdir $output_dir/cpu_data
 fi
 
-grep "all" $1 > ./cpu_data/cpu.all
-
-# for i in {0..77}
-# do
-#     echo "Extracting for CPU $i"
-#     grep -E "[0-9]{2}:[0-9]{2}:[0-9]{2}\s+$i.*" cpu.out > ./cpu_data/cpu.$i
-# done
+grep "all" $cpu_trace > $output_dir/cpu_data/cpu.all

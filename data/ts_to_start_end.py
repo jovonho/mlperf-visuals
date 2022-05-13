@@ -4,12 +4,12 @@ import numpy as np
 from pathlib import Path
 
 
-def main(filename):
+def main(filename, outdir):
 
     pid = os.path.basename(filename).split("_")[1]
 
     infile = open(filename, "r")
-    outfile = open(f"st_end_data/st_end_data_{pid}", "w")
+    outfile = open(f"{outdir}/st_end_data_{pid}", "w")
 
     for line in infile:
         cols = line.split(",")
@@ -25,7 +25,12 @@ if __name__ == "__main__":
         print(f"Usage: {sys.argv[0]} filename")
         exit(1)
 
-    Path("st_end_data").mkdir(parents=True, exist_ok=True)
-
     filename = sys.argv[1]
-    main(filename)
+    # Get parent directory
+    outdir = os.path.dirname(os.path.dirname(filename))
+    outdir = os.path.join(outdir, "st_end_data")
+
+    print(outdir)
+
+    Path(outdir).mkdir(parents=True, exist_ok=True)
+    main(filename, outdir)

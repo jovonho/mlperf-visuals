@@ -2,13 +2,15 @@ import os
 import argparse
 import numpy as np
 
+#TODO changig dates
+
 
 def main(cpu_trace):
     """
     Convert raw cpu usage data to a csv file
     """
     # Change this
-    current_date = "2022-04-29"
+    current_date = "2022-05-11"
 
     data_dir = os.path.dirname(cpu_trace)
 
@@ -42,7 +44,7 @@ def main(cpu_trace):
             break
 
         if not date_changed and cols[0] == "00:00:00":
-            current_date = "2022-02-06"
+            current_date = "2022-05-12"
             date_changed = True
 
         # Make UTC timestamp from time and current date
@@ -56,6 +58,7 @@ def main(cpu_trace):
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Generates a CSV from an mpstat trace of average cpu usage")
     p.add_argument("cpu_trace", help="The mpstat trace, containing only the lines for 'all'")
+    # p.add_argument("current_date", help="The date of the trace")
     args = p.parse_args()
 
     if not os.path.isfile(args.cpu_trace):

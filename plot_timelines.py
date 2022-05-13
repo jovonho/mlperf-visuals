@@ -239,10 +239,10 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
         print("Pad with epoch")
         df.loc[-1] = [ np.datetime64(start),  np.datetime64(end), "EPOCH"]
 
-    categories = ["Training"]
+    categories = ["Timeline"]
 
     ymins = [0]
-    colors_dict = dict(INIT="blue", EPOCH="gold", EVAL="darkorchid")
+    colors_dict = dict(INIT="blue", FIRST_EPOCH="crimson", EPOCH="gold", EVAL="darkorchid")
 
     # Select the last axes
     ax = axs[-1]
@@ -256,6 +256,8 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
         ymin = ymins[i] - 0.5
         yrange = (ymin, bar_height)
         colors = [colors_dict[event] for event in df.event]
+        # Plot vertical lines delimiting epoch starts
+        ax.vlines(x=start_dates, ymin=ymin, ymax=0.5, color='k', linewidth=0.5)
         ax.broken_barh(xranges, yrange, facecolors=colors, alpha=0.8)
         # you can set alpha to 0.6 to check if there are some overlaps
 
@@ -292,68 +294,76 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
     
     # Create output directory if it doesn't exist
     output_dir = os.path.dirname(filename)
-    pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(os.path.join("./plots/", output_dir)).mkdir(parents=True, exist_ok=True)
 
     plt.savefig(f"./plots/{filename}.png", format="png", dpi=500)
 
 
 if __name__ == "__main__":
 
-    DATA_DIR = "data/timeline_data/4gpu_baseline"
+    DATA_DIR = "data/ta_4gpus_100gb"
 
     pids = [
-        # "32260",       # Possibly just loading the mllog library
-        # "32261",
-        "32263",        # Main process
-        # "32264",
-        "32296",        # Multiprocessing resource tracker
-        "32297",        # Workers 
-        "32298",
-        "32299",
-        "32300",
+        "16910",    #master
+        "16943",    # RT
+        "16944",
+        "16945",
+        "16946",
+        "16947",
     ]
 
     pid_names = {
-        "32263": "master process",
-        "32296": "resource tracker", 
-        "32297": "worker 1",        
-        "32298": "worker 2",
-        "32299": "worker 3",
-        "32300": "worker 4",
+        "16910": "master process",
+        "16943": "resource tracker", 
+        "16944": "worker 1",        
+        "16945": "worker 2",
+        "16946": "worker 3",
+        "16947": "worker 4",
     }
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="MLCommons Image Segmentation - 4 GPUs Baseline",
-        filename="timelines/4gpu_baseline",
+        title="Image Segmentation - 4 GPUs, 100GB dataset",
+        filename="timelines/100gb/4gpus_100gb",
     )
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="MLCommons Image Segmentation - 4 GPUs Baseline - Last Moments",
-        start="2022-04-29T19:10:54",
-        end="2022-04-29T19:11:55",
+        title="Image Segmentation - 4 GPUs, 100GB dataset - First 5 Minutes",
+        start="2022-05-11T22:49:07",
+        end="2022-05-11T22:54:07",
+        xformat="%H:%M:%S",
+        margin=np.timedelta64(10, "s"),
+        filename="timelines/100gb/4gpus_100gb_first5min",
+    )
+
+    plot_pids_timeline_cpu_gpu(
+        pids, pid_names,
+        title="Image Segmentation - 4 GPUs, 100GB dataset - Last Moments",
+        start="2022-05-12T01:15:30",
+        end="2022-05-12T01:15:40",
+        xformat="%H:%M:%S",
+        margin=np.timedelta64(500, "ms"),
+        filename="timelines/100gb/4gpus_100gb_last_moments",
+    )
+
+    plot_pids_timeline_cpu_gpu(
+        pids, pid_names,
+        title="Image Segmentation - 4 GPUs, 100GB dataset - First Eval",
+        start="2022-05-11T23:50:47",
+        end="2022-05-11T23:52:58",
         xformat="%H:%M:%S",
         margin=np.timedelta64(5, "s"),
-        filename="timelines/4gpu_baseline_last_moments",
+        filename="timelines/100gb/4gpus_100gb_first_eval",
     )
 
-    plot_pids_timeline_cpu_gpu(
-        pids, pid_names,
-        title="MLCommons Image Segmentation - 4 GPUs Baseline - First 5 Minutes",
-        start="2022-04-29T18:15:30",
-        end="2022-04-29T18:20:30",
-        xformat="%H:%M:%S",
-        margin=np.timedelta64(15, "s"),
-        filename="timelines/4gpu_baseline_first5min",
-    )
 
-    plot_pids_timeline_cpu_gpu(
-        pids, pid_names,
-        title="MLCommons Image Segmentation - 4 GPUs Baseline - First Eval Period",
-        start="2022-04-29T18:30:30",
-        end="2022-04-29T18:33:30",
-        xformat="%H:%M:%S",
-        margin=np.timedelta64(5, "s"),
-        filename="timelines/4gpu_baseline_firsteval",
-    )
+    # plot_pids_timeline_cpu_gpu(
+    #     pids, pid_names,
+    #     title="MLCommons Image Segmentation - 4 GPUs Baseline - First Eval Period",
+    #     start="2022-04-29T18:30:30",
+    #     end="2022-04-29T18:33:30",
+    #     xformat="%H:%M:%S",
+    #     margin=np.timedelta64(5, "s"),
+    #     filename="timelines/4gpu_baseline_firsteval",
+    # )

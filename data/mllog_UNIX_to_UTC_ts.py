@@ -1,24 +1,19 @@
-import json
 import os
+import json
+import argparse
 import numpy as np
 
-
-def process_timeline():
+def process_timeline(datadir):
     """
     Convert the UNIX timestamps of the mllog to UTC timestamp
     """
-    cwd = os.path.basename(os.getcwd())
-    if cwd == "data":
-        path = "mllog_data"
-    else:
-        path = "data/mllog_data"
-
-    infile = open(f"{path}/timeline.log", "r")
-    outfile = open(f"{path}/timeline.csv", "w")
+    infile = open(f"{datadir}/timeline.log", "r")
+    outfile = open(f"{datadir}/timeline.csv", "w")
 
     all_logs = json.load(infile)
 
-    start_events = {}
+    started_events = {}
+    have_not_seen_epoch = True
 
     for i, log in enumerate(all_logs):
 
@@ -26,18 +21,23 @@ def process_timeline():
 
         key_parts = log["key"].split("_")
 
-        key = key_parts[0].upper()
-        key_type = key_parts[1]
+        evt = key_parts[0].upper()
+        evt_type = key_parts[1]
 
-        if key_type == "stop":
-            if key not in start_events:
+        if evt_type == "stop":
+            if evt not in started_events:
                 print(f"No starting event for {log['key']} at ts {log['time_ms']}\n")
                 continue
             else:
-                outfile.write(f"{start_events[key]},{ux_time},{key}\n")
-                del start_events[key]
+                # Label the first epoch differently
+                if evt == "EPOCH" and have_not_seen_epoch:
+                    outfile.write(f"{started_events[evt]},{ux_time},FIRST_EPOCH\n")
+                    have_not_seen_epoch = False
+                else:
+                    outfile.write(f"{started_events[evt]},{ux_time},{evt}\n")
+                del started_events[evt]
         else:
-            start_events[key] = ux_time
+            started_events[evt] = ux_time
 
 
 def process_vals():
@@ -62,5 +62,13 @@ def process_vals():
 
 
 if __name__ == "__main__":
-    process_timeline()
-    process_vals()
+    p = argparse.ArgumentParser(description="Changes the UNIX timestmap in the mllog to a UTC timestamp")
+    p.add_argument("datadir", help="directory where processed unet3d.log is found")
+    args = p.parse_args()
+
+    if not os.path.isdir(args.datadir):
+        print(f"Invalid data directory given")
+        exit(-1) 
+
+    process_timeline(args.datadir)
+    # process_vals()
