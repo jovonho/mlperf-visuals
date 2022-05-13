@@ -301,61 +301,121 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
 
 if __name__ == "__main__":
 
-    DATA_DIR = "data/ta_4gpus_100gb"
+
+    DATA_DIR = "data/ta_4gpus_1xRAM"
 
     pids = [
-        "16910",    #master
-        "16943",    # RT
-        "16944",
-        "16945",
-        "16946",
-        "16947",
+        "33677",    #master
+        "33710",    # RT
+        "33711",
+        "33712",
+        "33713",
+        "33714",
     ]
 
     pid_names = {
-        "16910": "master process",
-        "16943": "resource tracker", 
-        "16944": "worker 1",        
-        "16945": "worker 2",
-        "16946": "worker 3",
-        "16947": "worker 4",
+        "33677": "master process",
+        "33710": "resource tracker", 
+        "33711": "worker 1",        
+        "33712": "worker 2",
+        "33713": "worker 3",
+        "33714": "worker 4",
     }
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset",
-        filename="timelines/100gb/4gpus_100gb",
+        title="Image Segmentation - 4 GPUs 1xRAM dataset",
+        filename="timelines/1xRAM/4gpus_1xRAM",
     )
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset - First 5 Minutes",
-        start="2022-05-11T22:49:07",
-        end="2022-05-11T22:54:07",
+        title="Image Segmentation - 4 GPUs 1xRAM dataset - First 5 Minutes",
+        start="2022-04-29T19:29:25",
+        end="2022-04-29T19:34:25",
         xformat="%H:%M:%S",
-        margin=np.timedelta64(10, "s"),
-        filename="timelines/100gb/4gpus_100gb_first5min",
+        margin=np.timedelta64(1, "s"),
+        filename="timelines/1xRAM/4gpus_1xRAM_first5min",
     )
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset - Last Moments",
-        start="2022-05-12T01:15:30",
-        end="2022-05-12T01:15:40",
+        title="Image Segmentation - 4 GPUs 1xRAM dataset - Last Moments",
+        start="2022-04-30T02:03:45",
+        end="2022-04-30T02:04:05",
         xformat="%H:%M:%S",
         margin=np.timedelta64(500, "ms"),
-        filename="timelines/100gb/4gpus_100gb_last_moments",
+        filename="timelines/1xRAM/4gpus_1xRAM_last_moments",
     )
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset - First Eval",
-        start="2022-05-11T23:50:47",
-        end="2022-05-11T23:52:58",
+        title="Image Segmentation - 4 GPUs 1xRAM dataset - First Eval",
+        start="2022-04-29T22:28:40",
+        end="2022-04-29T22:31:00",
         xformat="%H:%M:%S",
         margin=np.timedelta64(5, "s"),
-        filename="timelines/100gb/4gpus_100gb_first_eval",
+        filename="timelines/1xRAM/4gpus_1xRAM_first_eval",
     )
+
+
+
+
+    # DATA_DIR = "data/ta_4gpus_100gb"
+
+    # pids = [
+    #     "16910",    #master
+    #     "16943",    # RT
+    #     "16944",
+    #     "16945",
+    #     "16946",
+    #     "16947",
+    # ]
+
+    # pid_names = {
+    #     "16910": "master process",
+    #     "16943": "resource tracker", 
+    #     "16944": "worker 1",        
+    #     "16945": "worker 2",
+    #     "16946": "worker 3",
+    #     "16947": "worker 4",
+    # }
+
+    # plot_pids_timeline_cpu_gpu(
+    #     pids, pid_names,
+    #     title="Image Segmentation - 4 GPUs, 100GB dataset",
+    #     filename="timelines/100gb/4gpus_100gb",
+    # )
+
+    # plot_pids_timeline_cpu_gpu(
+    #     pids, pid_names,
+    #     title="Image Segmentation - 4 GPUs, 100GB dataset - First 5 Minutes",
+    #     start="2022-05-11T22:49:07",
+    #     end="2022-05-11T22:54:07",
+    #     xformat="%H:%M:%S",
+    #     margin=np.timedelta64(10, "s"),
+    #     filename="timelines/100gb/4gpus_100gb_first5min",
+    # )
+
+    # plot_pids_timeline_cpu_gpu(
+    #     pids, pid_names,
+    #     title="Image Segmentation - 4 GPUs, 100GB dataset - Last Moments",
+    #     start="2022-05-12T01:15:30",
+    #     end="2022-05-12T01:15:40",
+    #     xformat="%H:%M:%S",
+    #     margin=np.timedelta64(500, "ms"),
+    #     filename="timelines/100gb/4gpus_100gb_last_moments",
+    # )
+
+    # plot_pids_timeline_cpu_gpu(
+    #     pids, pid_names,
+    #     title="Image Segmentation - 4 GPUs, 100GB dataset - First Eval",
+    #     start="2022-05-11T23:50:47",
+    #     end="2022-05-11T23:52:58",
+    #     xformat="%H:%M:%S",
+    #     margin=np.timedelta64(5, "s"),
+    #     filename="timelines/100gb/4gpus_100gb_first_eval",
+    # )
 
 
     # plot_pids_timeline_cpu_gpu(

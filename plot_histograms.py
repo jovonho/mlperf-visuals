@@ -252,7 +252,86 @@ def plot_individual_hists(pids, pid_names, hists, datadir, title, outdir, log_co
 
 
 if __name__ == "__main__":
-   
+
+    # Histograms you want to plot
+    hists = [
+        "bio_lat",
+        "bio_size",
+        "open_lat",
+        "read_lat",
+        "read_size",
+    ]
+
+    hists_pretty_titles = {
+        "bio_lat": "BIO Read Latencies",
+        "bio_size": "BIO Read Sizes",
+        "open_lat": "open() Latencies",
+        "read_lat": "read() Latencies",
+        "read_size": "read() Sizes",
+    }
+
+    DATA_DIR = "data/4gpus_1xRAM"
+
+    pids = [
+        # "32260",       # Possibly just loading the mllog library
+        # "32261",
+        "33677",        # Main process
+        # "32264",
+        "33710",        # Multiprocessing resource tracker
+        "33711",        # Workers 
+        "33712",
+        "33713",
+        "33714",
+        "combined"
+    ]
+
+    pid_names = {
+        "33677": "master process",
+        "33710": "resource tracker", 
+        "33711": "worker 1",        
+        "33712": "worker 2",
+        "33713": "worker 3",
+        "33714": "worker 4",
+        "combined": "combined"
+    }
+
+    
+    title = "Image Segmentation - 4 GPUs 1xRAM"
+
+    plot_all_hists(
+        pids, 
+        pid_names,
+        hists, 
+        hists_pretty_titles = hists_pretty_titles,
+        datadir = DATA_DIR,
+        title=title,
+        filename="plots/histograms/4gpu_1xRAM_hists.png", 
+        log_counts=False
+    )
+
+    plot_all_hists(
+        pids, 
+        pid_names,
+        hists, 
+        hists_pretty_titles = hists_pretty_titles,
+        datadir = DATA_DIR,
+        title=title,
+        filename="plots/histograms/4gpu_1xRAM_hists_log.png", 
+        log_counts=True
+    )
+
+    plot_individual_hists(
+        pids, 
+        pid_names,
+        hists, 
+        datadir = DATA_DIR,
+        title=title,
+        outdir="plots/histograms/1xRAM", 
+        log_counts=True
+    )
+
+    exit(0)
+    
     DATA_DIR = "data/ta_4gpus_100gb"
 
     pids = [
@@ -275,35 +354,18 @@ if __name__ == "__main__":
         "combined": "combined"
     }
 
-    # Histograms you want to plot
-    hists = [
-        "bio_lat",
-        "bio_size",
-        "open_lat",
-        "read_lat",
-        "read_size",
-    ]
-
-    hists_pretty_titles = {
-        "bio_lat": "BIO Read Latencies",
-        "bio_size": "BIO Read Sizes",
-        "open_lat": "open() Latencies",
-        "read_lat": "read() Latencies",
-        "read_size": "read() Sizes",
-    }
-
     title = "Image Segmentation - 4 GPUs 100GB"
 
-    plot_all_hists(
-        pids, 
-        pid_names,
-        hists, 
-        hists_pretty_titles = hists_pretty_titles,
-        datadir = DATA_DIR,
-        title=title,
-        filename="plots/histograms/4gpu_100gb_hists.png", 
-        log_counts=False
-    )
+    # plot_all_hists(
+    #     pids, 
+    #     pid_names,
+    #     hists, 
+    #     hists_pretty_titles = hists_pretty_titles,
+    #     datadir = DATA_DIR,
+    #     title=title,
+    #     filename="plots/histograms/4gpu_100gb_hists.png", 
+    #     log_counts=False
+    # )
 
     plot_all_hists(
         pids, 
@@ -326,12 +388,22 @@ if __name__ == "__main__":
     #     log_counts=False
     # )
 
-    plot_individual_hists(
-        pids, 
-        pid_names,
-        hists, 
-        datadir = DATA_DIR,
-        title=title,
-        outdir="plots/histograms/100gb", 
-        log_counts=True
-    )
+    # plot_individual_hists(
+    #     pids, 
+    #     pid_names,
+    #     hists, 
+    #     datadir = DATA_DIR,
+    #     title=title,
+    #     outdir="plots/histograms/100gb", 
+    #     log_counts=True
+    # )
+
+
+# 2xRAM
+# +REF_TIMESTAMP = 104994782256577
+# +REF_LOCALTIME = np.datetime64("2022-04-29T22:40:37.000000000")
+
+# 1xRAM
+# 75530751851216 2022-04-29T14:29:33.000000000
+
+   

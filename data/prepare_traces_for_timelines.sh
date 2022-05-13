@@ -53,7 +53,7 @@ while read pid; do
     # Transform timestamps and latency into start and end dates for plotting
     py ts_to_start_end.py $outfile
 
-done < ./unique_pids
+done < $outdir/unique_pids
 
 # Cleanup
 rm bio_tmp open_tmp read_tmp write_tmp

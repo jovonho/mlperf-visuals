@@ -10,7 +10,7 @@ def main(cpu_trace):
     Convert raw cpu usage data to a csv file
     """
     # Change this
-    current_date = "2022-05-11"
+    current_date = "2022-04-29"
 
     data_dir = os.path.dirname(cpu_trace)
 
@@ -44,7 +44,7 @@ def main(cpu_trace):
             break
 
         if not date_changed and cols[0] == "00:00:00":
-            current_date = "2022-05-12"
+            current_date = "2022-04-30"
             date_changed = True
 
         # Make UTC timestamp from time and current date

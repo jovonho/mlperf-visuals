@@ -31,7 +31,7 @@ fi
 ./cpu.sh $traces_dir/cpu.out $ta_outdir
 py cpu_all.py $ta_outdir/cpu_data/cpu.all
 
-./gpu.sh $traces_dir/gpu.py.out $ta_outdir
+./gpu.sh $traces_dir/gpu.out $ta_outdir
 py gpu_avg.py $ta_outdir/gpu_data/gpu.all
 
 ./mllog.sh $traces_dir/unet3d.log $ta_outdir
