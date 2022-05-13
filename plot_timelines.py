@@ -301,46 +301,48 @@ def plot_pids_timeline_cpu_gpu(pids, pid_names, title, start=None, end=None, xfo
 
 if __name__ == "__main__":
 
-    DATA_DIR = "data/ta_4gpus_100gb"
+    DATA_DIR = "data/ta_4gpus_2xRAM"
 
     pids = [
-        "16910",    #master
-        "16943",    # RT
-        "16944",
-        "16945",
-        "16946",
-        "16947",
+        "40232",    #master
+        "40265",    # RT
+        "40266",
+        "40267",
+        "40268",
+        "40269",
     ]
 
     pid_names = {
-        "16910": "master process",
-        "16943": "resource tracker", 
-        "16944": "worker 1",        
-        "16945": "worker 2",
-        "16946": "worker 3",
-        "16947": "worker 4",
+        "40232": "master process",
+        "40265": "resource tracker", 
+        "40266": "worker 1",        
+        "40267": "worker 2",
+        "40268": "worker 3",
+        "40269": "worker 4",
     }
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset",
-        filename="timelines/100gb/4gpus_100gb",
+        title="Image Segmentation - 4 GPUs 2xRAM dataset",
+        filename="timelines/2xRAM/4gpus_2xRAM",
     )
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset - First 5 Minutes",
-        start="2022-05-11T22:49:07",
-        end="2022-05-11T22:54:07",
+        title="Image Segmentation - 4 GPUs 2xRAM dataset- First 5 Minutes",
+        start="2022-04-29T03:40:45",
+        end="2022-04-29T03:45:45",
         xformat="%H:%M:%S",
-        margin=np.timedelta64(10, "s"),
-        filename="timelines/100gb/4gpus_100gb_first5min",
+        margin=np.timedelta64(5, "s"),
+        filename="timelines/2xRAM/4gpus_2xRAM_first5min",
     )
+
+    exit(0)
 
     plot_pids_timeline_cpu_gpu(
         pids, pid_names,
-        title="Image Segmentation - 4 GPUs, 100GB dataset - Last Moments",
-        start="2022-05-12T01:15:30",
+        title="Image Segmentation - 4 GPUs 2xRAM - Last Moments",
+        start="2022-04-29T14:09:",
         end="2022-05-12T01:15:40",
         xformat="%H:%M:%S",
         margin=np.timedelta64(500, "ms"),

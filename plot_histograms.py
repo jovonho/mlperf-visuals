@@ -1,4 +1,3 @@
-﻿from black import out
 from matplotlib import pyplot as plt, patches as mpatches, ticker
 import os
 import pathlib
@@ -253,25 +252,25 @@ def plot_individual_hists(pids, pid_names, hists, datadir, title, outdir, log_co
 
 if __name__ == "__main__":
    
-    DATA_DIR = "data/ta_4gpus_100gb"
+    DATA_DIR = "data/ta_4gpus_2xRAM"
 
     pids = [
-        "16910",    #master
-        "16943",    # RT
-        "16944",
-        "16945",
-        "16946",
-        "16947",
-        "combined"
+        "40232",    #master
+        "40265",    # RT
+        "40266",
+        "40267",
+        "40268",
+        "40269",        
+	"combined"
     ]
 
     pid_names = {
-        "16910": "master process",
-        "16943": "resource tracker", 
-        "16944": "worker 1",        
-        "16945": "worker 2",
-        "16946": "worker 3",
-        "16947": "worker 4",
+        "40232": "master process",
+        "40265": "resource tracker", 
+        "40266": "worker 1",        
+        "40267": "worker 2",
+        "40268": "worker 3",
+        "40269": "worker 4",
         "combined": "combined"
     }
 
@@ -292,7 +291,7 @@ if __name__ == "__main__":
         "read_size": "read() Sizes",
     }
 
-    title = "Image Segmentation - 4 GPUs 100GB"
+    title = "Image Segmentation - 4 GPUs 2xRAM"
 
     plot_all_hists(
         pids, 
@@ -301,7 +300,7 @@ if __name__ == "__main__":
         hists_pretty_titles = hists_pretty_titles,
         datadir = DATA_DIR,
         title=title,
-        filename="plots/histograms/4gpu_100gb_hists.png", 
+        filename="plots/histograms/4gpu_2xRAM_hists.png", 
         log_counts=False
     )
 
@@ -312,7 +311,7 @@ if __name__ == "__main__":
         hists_pretty_titles = hists_pretty_titles,
         datadir = DATA_DIR,
         title=title,
-        filename="plots/histograms/4gpu_100gb_hists_log.png", 
+        filename="plots/histograms/4gpu_2xRAM_hists_log.png", 
         log_counts=True
     )
 
@@ -332,6 +331,6 @@ if __name__ == "__main__":
         hists, 
         datadir = DATA_DIR,
         title=title,
-        outdir="plots/histograms/100gb", 
+        outdir="plots/histograms/2xRAM", 
         log_counts=True
     )
