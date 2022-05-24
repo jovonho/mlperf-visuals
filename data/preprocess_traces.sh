@@ -16,7 +16,12 @@ then
 fi
 
 traces_dir=$1
-ta_outdir="ta_$1"
+
+traces_basename=$(basename $traces_dir)
+traces_dirname=$(dirname $traces_dir)
+
+ta_outdir="${traces_dirname}/ta_${traces_basename}"
+echo $ta_outdir
 mkdir -p $ta_outdir
 
 num_gpus=$2
