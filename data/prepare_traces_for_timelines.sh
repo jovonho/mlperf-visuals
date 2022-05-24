@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Determine the python executable to call
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    MINGW*)     py=py;;
+    *)          py=python3;;
+esac
+
+
 if [[ $# -ne 1 ]]
 then
     echo "Usage: $0 output_dir"
@@ -23,12 +31,10 @@ while read pid; do
     outfile="$outdir/traces_data/comb_$pid"
 
     echo "Writing $outfile"
-
     bio="$outdir/bio_data/bio_$pid"
     open="$outdir/open_data/open_$pid"
     read="$outdir/read_data/read_$pid"
     write="$outdir/write_data/write_$pid"
-
 
     # Handle the different traces, we will keep only the timestamp, type and latency here
     echo -e "\tbio"
@@ -48,10 +54,8 @@ while read pid; do
     cat bio_tmp open_tmp read_tmp write_tmp > $outfile
     sort -o $outfile $outfile
 
-    # cp $outfile qa_check_$pid
-
     # Transform timestamps and latency into start and end dates for plotting
-    py ts_to_start_end.py $outfile
+    ${py} ts_to_start_end.py $outfile
 
 done < $outdir/unique_pids
 

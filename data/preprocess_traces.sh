@@ -11,7 +11,7 @@ esac
 
 if [ $# -lt 2 ]
 then
-    echo "Usage: $0 traces_dir num_gpus"
+    echo "Usage: $0 traces_dir output_dir num_gpus"
     exit -1
 fi
 
