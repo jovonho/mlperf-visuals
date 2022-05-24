@@ -7,7 +7,7 @@ import pandas as pd
 from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colors
 
 
-def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="%H:%M", margin=np.timedelta64(60, "s"), filename=None):
+def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None, xformat="%H:%M", margin=np.timedelta64(60, "s"), filename=None):
     pids = list(pid_names.keys())
     bar_height = 1
     ymins = [0, 1, 2]
@@ -32,7 +32,7 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
     # Plot CPU
     #
     df = pd.read_csv(
-        os.path.join(DATA_DIR, "cpu_data/cpu_all.csv"),
+        os.path.join(data_dir, "cpu_data/cpu_all.csv"),
         sep=",",
     )
     df["timestamp"] = pd.to_datetime(df["timestamp"])
@@ -70,7 +70,7 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
     #
     # Plot GPU
     #
-    df = pd.read_csv(os.path.join(DATA_DIR, "gpu_data/gpu_avg.csv"), sep=",")
+    df = pd.read_csv(os.path.join(data_dir, "gpu_data/gpu_avg.csv"), sep=",")
     df["timestamp"] = pd.to_datetime(df["timestamp"])
 
     if start is not None:
@@ -128,7 +128,7 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
         print(f"Processing pid {pid}")
 
         df = pd.read_csv(
-            os.path.join(DATA_DIR, f"st_end_data/st_end_data_{pid}"), names=["start_date", "end_date", "event"]
+            os.path.join(data_dir, f"st_end_data/st_end_data_{pid}"), names=["start_date", "end_date", "event"]
         )
         df = df[["start_date", "end_date", "event"]]
         df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
@@ -202,7 +202,7 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
     #
     print(f"Processing timeline")
 
-    df = pd.read_csv(os.path.join(DATA_DIR, "mllog_data/timeline.csv"), names=["start_date", "end_date", "event"])
+    df = pd.read_csv(os.path.join(data_dir, "mllog_data/timeline.csv"), names=["start_date", "end_date", "event"])
 
     df = df[["start_date", "end_date", "event"]]
     df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
@@ -322,9 +322,11 @@ if __name__ == "__main__":
         print(f"ERROR: PID to Name mapping file invalid!")
         exit(-1) 
 
-    pid_names = json.load(args.pid_names)
+    pid_names = open(args.pid_names, 'r')
+    pid_names = json.load(pid_names)
 
     plot_pids_timeline_cpu_gpu(
+        args.data_dir,
         pid_names,
         title=args.title,
         filename=args.filename,
