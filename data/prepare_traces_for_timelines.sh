@@ -32,7 +32,7 @@ while read pid; do
 
     # Handle the different traces, we will keep only the timestamp, type and latency here
     echo -e "\tbio"
-    awk -F ' ' '{printf $1","; if ($3=="R") printf "BIOR,"; else printf "BIOW,"; printf $6"\n";}' $bio > bio_tmp
+    awk -F ' ' '{printf $1","; if ($3=="R") printf "BIOR,"; else printf "BIOW,"; printf $5"\n";}' $bio > bio_tmp
 
     echo -e "\topen"
     awk -F ' ' '{printf $1",OPENAT,"$3"\n";}' $open > open_tmp

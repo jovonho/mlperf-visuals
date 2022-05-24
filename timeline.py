@@ -1,5 +1,7 @@
+import json
 import os.path
 import pathlib
+import argparse
 import numpy as np
 import pandas as pd
 from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colors
@@ -296,156 +298,34 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
     output_dir = os.path.dirname(filename)
     pathlib.Path(os.path.join("./plots/", output_dir)).mkdir(parents=True, exist_ok=True)
 
-    plt.savefig(f"./plots/{filename}.png", format="png", dpi=500)
+    plt.savefig(f"./plots/{filename}", format="png", dpi=500)
 
 
 if __name__ == "__main__":
-
-    DATA_DIR = "data/ta_4gpu_1xRAM_ref"
 
     # TODO: Automate this process. Would need to extract relevant PIDs from the many that show up
     # and find a way to ID which is which. Else this will remain manual.
     # Even better: use the output of ps aux to ID which is the master and which are the 
 
-    pid_names = {
-        "65757": "main process",
-        "65758": "worker 1",        
-        "65759": "worker 2",
-        "65760": "worker 3",
-        "65761": "worker 4",
-    }
+    p = argparse.ArgumentParser(description="Create the overall timeline plot for a given run")
+    p.add_argument("data_dir", help="Directory where the preprocessed traces are")
+    p.add_argument("pid_names", help="JSON file containing the PID->Name mappings")
+    p.add_argument("filename", help="Output filename (will be PNG file) - will be created in './plots' folder relative to this script")
+    p.add_argument("title", help="Title of the plot")
+    args = p.parse_args()
+
+    if not os.path.isdir(args.data_dir):
+        print(f"ERROR: Invalid trace directory")
+        exit(-1) 
+
+    if not os.path.isfile(args.pid_names):
+        print(f"ERROR: PID to Name mapping file invalid!")
+        exit(-1) 
+
+    pid_names = json.load(args.pid_names)
 
     plot_pids_timeline_cpu_gpu(
         pid_names,
-        title="Image Segmentation - 4 GPUs 1xRAM dataset - run w DDP launch.py",
-        filename="timelines/1xRAM_ref/4gpus_1xRAM_ref",
+        title=args.title,
+        filename=args.filename,
     )
-
-    exit(0)
-
-
-    DATA_DIR = "data/ta_4gpu_1xRAM"
-
-    pids = [
-        "33677",    #master
-        "33710",    # RT
-        "33711",
-        "33712",
-        "33713",
-        "33714",
-    ]
-
-    pid_names = {
-        "33677": "master process",
-        "33710": "resource tracker", 
-        "33711": "worker 1",        
-        "33712": "worker 2",
-        "33713": "worker 3",
-        "33714": "worker 4",
-    }
-
-    plot_pids_timeline_cpu_gpu(
-        pid_names,
-        title="Image Segmentation - 4 GPUs 1xRAM dataset",
-        filename="timelines/1xRAM/4gpus_1xRAM",
-    )
-
-    plot_pids_timeline_cpu_gpu(
-        pid_names,
-        title="Image Segmentation - 4 GPUs 1xRAM dataset - First 5 Minutes",
-        start="2022-04-29T19:29:25",
-        end="2022-04-29T19:34:25",
-        xformat="%H:%M:%S",
-        margin=np.timedelta64(1, "s"),
-        filename="timelines/1xRAM/4gpus_1xRAM_first5min",
-    )
-
-    plot_pids_timeline_cpu_gpu(
-        pid_names,
-        title="Image Segmentation - 4 GPUs 1xRAM dataset - Last Moments",
-        start="2022-04-30T02:03:45",
-        end="2022-04-30T02:04:05",
-        xformat="%H:%M:%S",
-        margin=np.timedelta64(500, "ms"),
-        filename="timelines/1xRAM/4gpus_1xRAM_last_moments",
-    )
-
-    plot_pids_timeline_cpu_gpu(
-        pid_names,
-        title="Image Segmentation - 4 GPUs 1xRAM dataset - First Eval",
-        start="2022-04-29T22:28:40",
-        end="2022-04-29T22:31:00",
-        xformat="%H:%M:%S",
-        margin=np.timedelta64(5, "s"),
-        filename="timelines/1xRAM/4gpus_1xRAM_first_eval",
-    )
-
-
-
-
-    # DATA_DIR = "data/ta_4gpus_100gb"
-
-    # pids = [
-    #     "16910",    #master
-    #     "16943",    # RT
-    #     "16944",
-    #     "16945",
-    #     "16946",
-    #     "16947",
-    # ]
-
-    # pid_names = {
-    #     "16910": "master process",
-    #     "16943": "resource tracker", 
-    #     "16944": "worker 1",        
-    #     "16945": "worker 2",
-    #     "16946": "worker 3",
-    #     "16947": "worker 4",
-    # }
-
-    # plot_pids_timeline_cpu_gpu(
-    #     pid_names,
-    #     title="Image Segmentation - 4 GPUs, 100GB dataset",
-    #     filename="timelines/100gb/4gpus_100gb",
-    # )
-
-    # plot_pids_timeline_cpu_gpu(
-    #     pid_names,
-    #     title="Image Segmentation - 4 GPUs, 100GB dataset - First 5 Minutes",
-    #     start="2022-05-11T22:49:07",
-    #     end="2022-05-11T22:54:07",
-    #     xformat="%H:%M:%S",
-    #     margin=np.timedelta64(10, "s"),
-    #     filename="timelines/100gb/4gpus_100gb_first5min",
-    # )
-
-    # plot_pids_timeline_cpu_gpu(
-    #     pid_names,
-    #     title="Image Segmentation - 4 GPUs, 100GB dataset - Last Moments",
-    #     start="2022-05-12T01:15:30",
-    #     end="2022-05-12T01:15:40",
-    #     xformat="%H:%M:%S",
-    #     margin=np.timedelta64(500, "ms"),
-    #     filename="timelines/100gb/4gpus_100gb_last_moments",
-    # )
-
-    # plot_pids_timeline_cpu_gpu(
-    #     pid_names,
-    #     title="Image Segmentation - 4 GPUs, 100GB dataset - First Eval",
-    #     start="2022-05-11T23:50:47",
-    #     end="2022-05-11T23:52:58",
-    #     xformat="%H:%M:%S",
-    #     margin=np.timedelta64(5, "s"),
-    #     filename="timelines/100gb/4gpus_100gb_first_eval",
-    # )
-
-
-    # plot_pids_timeline_cpu_gpu(
-    #     pid_names,
-    #     title="MLCommons Image Segmentation - 4 GPUs Baseline - First Eval Period",
-    #     start="2022-04-29T18:30:30",
-    #     end="2022-04-29T18:33:30",
-    #     xformat="%H:%M:%S",
-    #     margin=np.timedelta64(5, "s"),
-    #     filename="timelines/4gpu_baseline_firsteval",
-    # )

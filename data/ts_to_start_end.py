@@ -12,11 +12,15 @@ def main(filename, outdir):
     outfile = open(f"{outdir}/st_end_data_{pid}", "w")
 
     for line in infile:
-        cols = line.split(",")
-        ts_end = np.datetime64(cols[0])
-        lat = int(cols[2])
-        ts_start = ts_end - lat
-        outfile.write(f"{ts_start},{ts_end},{cols[1]}\n")
+        try:
+            cols = line.split(",")
+            ts_end = np.datetime64(cols[0])
+            lat = int(cols[2])
+            ts_start = ts_end - lat
+            outfile.write(f"{ts_start},{ts_end},{cols[1]}\n")
+        except Exception as e:
+            print(e)
+            continue
 
 
 if __name__ == "__main__":

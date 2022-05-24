@@ -46,8 +46,8 @@ done
 sort -u $datadir/unique_pids_tmp > $datadir/unique_pids
 rm $datadir/unique_pids_tmp
 
-# Remove empty lines
-sed '/^[[:space:]]*$/d' $datadir/unique_pids
+# Remove empty lines from the pids
+sed -i '/^[[:space:]]*$/d' $datadir/unique_pids
 
 echo "PIDs extracted:"
 cat $datadir/unique_pids
