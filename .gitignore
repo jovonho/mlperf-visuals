@@ -8,6 +8,7 @@ data/2gpu_*
 data/2gpus_*
 data/1gpu_*
 data/1gpus_*
+data/results
 
 data/ta_*
 data/*.out
