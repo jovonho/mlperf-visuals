@@ -38,26 +38,25 @@ while read pid; do
 
     # Handle the different traces, we will keep only the timestamp, type and latency here
     echo -e "\tbio"
-    awk -F ' ' '{printf $1","; if ($3=="R") printf "BIOR,"; else printf "BIOW,"; printf $5"\n";}' $bio > bio_tmp
+    awk -F ' ' '{printf $1","; if ($3=="R") printf "BIOR,"; else printf "BIOW,"; printf $5"\n";}' $bio > $outdir/bio_tmp
 
     echo -e "\topen"
-    awk -F ' ' '{printf $1",OPENAT,"$3"\n";}' $open > open_tmp
+    awk -F ' ' '{printf $1",OPENAT,"$3"\n";}' $open > $outdir/open_tmp
 
     echo -e "\tread"
-    awk -F ' ' '{printf $1",READ,"$4"\n";}' $read > read_tmp
+    awk -F ' ' '{printf $1",READ,"$4"\n";}' $read > $outdir/read_tmp
 
     echo -e "\twrite"
-    awk -F ' ' '{printf $1",WRITE,"$4"\n";}' $write > write_tmp
-
+    awk -F ' ' '{printf $1",WRITE,"$4"\n";}' $write > $outdir/write_tmp
 
     # Merge the traces into one, sort
-    cat bio_tmp open_tmp read_tmp write_tmp > $outfile
+    cat $outdir/bio_tmp $outdir/open_tmp $outdir/read_tmp $outdir/write_tmp > $outfile
     sort -o $outfile $outfile
 
     # Transform timestamps and latency into start and end dates for plotting
     ${py} ts_to_start_end.py $outfile
 
-done < $outdir/unique_pids
+done < $outdir/pids
 
 # Cleanup
-rm bio_tmp open_tmp read_tmp write_tmp
+rm $outdir/bio_tmp $outdir/open_tmp $outdir/read_tmp $outdir/write_tmp

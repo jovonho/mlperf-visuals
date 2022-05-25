@@ -33,24 +33,11 @@ then
     mkdir -p $datadir/write_data
 fi
 
-
-# Extract unique PIDs from each trace file, then take the unique ones
-# This will ensure we will not miss a PID only appearing in one trace
-for file in $(find $1 -maxdepth 1 -type f -exec echo {} +)
-do
-    echo "Extracting PIDs from $file"
-    awk -F ' ' '{print $2,$3}' $file | awk -F ' ' '{print $1}' | sort -u >> $datadir/unique_pids_tmp
-    
-done
-
-sort -u $datadir/unique_pids_tmp > $datadir/unique_pids
-rm $datadir/unique_pids_tmp
-
 # Remove empty lines from the pids
-sed -i '/^[[:space:]]*$/d' $datadir/unique_pids
+sed -i '/^[[:space:]]*$/d' $datadir/pids
 
-echo "PIDs extracted:"
-cat $datadir/unique_pids
+echo "PIDs to be extracted:"
+cat $datadir/pids
 
 # Use the PIDs to extract their lines from each trace
 while read pid; do
@@ -70,4 +57,4 @@ while read pid; do
     grep -a " $pid " $1/write_time_aligned.out | awk -F ' ' '{print $1,$2,$4,$8,$9}' > "$datadir/write_data/write_$pid"
 
 
-done < $datadir/unique_pids
+done < $datadir/pids

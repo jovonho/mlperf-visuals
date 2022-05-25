@@ -22,7 +22,7 @@ while read pid; do
 
     awk -F ' ' '{print $8}' "writes/vfs_writes/vfs_writes_$pid" | sort | uniq -c | sort -r > "writes/vfs_writes/written_files_$pid"
 
-done < ./unique_pids
+done < ./pids
 
 
 

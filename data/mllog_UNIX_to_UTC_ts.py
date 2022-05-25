@@ -31,7 +31,7 @@ def process_timeline(datadir):
             else:
                 # Label the first epoch differently
                 if evt == "EPOCH" and have_not_seen_epoch:
-                    outfile.write(f"{started_events[evt]},{ux_time},FIRST_EPOCH\n")
+                    outfile.write(f"{started_events[evt]},{ux_time},EPOCH\n")
                     have_not_seen_epoch = False
                 else:
                     outfile.write(f"{started_events[evt]},{ux_time},{evt}\n")
