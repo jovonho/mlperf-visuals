@@ -198,7 +198,6 @@ def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%
             ]
             ax.legend(handles=patches, bbox_to_anchor=(1, 0.5), loc="center left")
 
-
     # Set the x axis limits
     # We do this here so that we create a margin around the trace data min/max vs. the timeline
     # data which we care less about. This makes the start/end setting work more as expected.
@@ -209,7 +208,6 @@ def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%
         df.start_date.min() - margin,
         df.end_date.max() + margin,
     )
-
 
     #
     # Plot the timeline
@@ -336,12 +334,12 @@ def get_plotting_ranges(data_dir):
 
     interesting_time_ranges = {
         "init": (np.datetime64(init.start_date), np.datetime64(init.end_date)),
-        # "first_30s": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_30s),
-        # "first_5min": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_5min),
-        # "first_epoch": (np.datetime64(first_epoch.start_date) - td_5s, np.datetime64(first_epoch.end_date) + td_5s),
-        # "first_eval": (np.datetime64(first_eval.start_date) - td_5s, np.datetime64(first_eval.end_date) + td_5s),
-        # "last_2min": (np.datetime64(last_event.end_date) - td_2min, np.datetime64(last_event.end_date)),
-        # "last_5s": (np.datetime64(last_event.end_date) - td_5s, np.datetime64(last_event.end_date)),
+        "first_30s": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_30s),
+        "first_5min": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_5min),
+        "first_epoch": (np.datetime64(first_epoch.start_date) - td_5s, np.datetime64(first_epoch.end_date) + td_5s),
+        "first_eval": (np.datetime64(first_eval.start_date) - td_5s, np.datetime64(first_eval.end_date) + td_5s),
+        "last_2min": (np.datetime64(last_event.end_date) - td_2min, np.datetime64(last_event.end_date)),
+        "last_5s": (np.datetime64(last_event.end_date) - td_5s, np.datetime64(last_event.end_date)),
     }
 
     # code.interact(local=locals())
@@ -360,11 +358,11 @@ if __name__ == "__main__":
         print(f"ERROR: Invalid trace directory")
         exit(-1) 
 
-    # plot_pids_timeline_cpu_gpu(
-    #     args.data_dir,
-    #     title=args.experiment_name,
-    #     filename=f"timelines/{args.experiment_name}/overview.png",
-    # )
+    plot_pids_timeline_cpu_gpu(
+        args.data_dir,
+        title=args.experiment_name,
+        filename=f"timelines/{args.experiment_name}/overview.png",
+    )
 
     # Extract times of first epoch, first eval, first 5 min and last 5 minutes from the mllog file
     interesting_time_ranges = get_plotting_ranges(args.data_dir)
@@ -380,7 +378,7 @@ if __name__ == "__main__":
             start=start,
             end=end,
             xformat="%H:%M:%S",
-            margin=np.timedelta64(1, "s") if name != "init" else np.timedelta64(1, "ms"),
+            margin=np.timedelta64(1, "s") if name != "init" else np.timedelta64(100, "ms"),
             filename=f"timelines/{args.experiment_name}/{name}.png",
         )
 
