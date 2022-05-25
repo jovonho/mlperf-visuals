@@ -7,7 +7,6 @@ then
 fi
 
 dir=$1
-parent=$(basename $dir)
 
 for d in $(ls $dir | grep -v ta_)
 do

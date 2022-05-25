@@ -133,7 +133,7 @@ if __name__ == "__main__":
     args = p.parse_args()
 
     if not os.path.isdir(args.traces_dir):
-        print(f"Invalid trace directory")
+        print(f"ERROR: Invalid trace directory {args.traces_dir}")
         exit(-1) 
 
     time_align_trace = os.path.join(args.traces_dir, "trace_time_align.out")
