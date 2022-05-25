@@ -3,7 +3,7 @@
 if [ $# -ne 1 ]
 then
     echo "Usage: $0 <data dir>" 
-done
+fi
 
 dir=$1
 parent=$(basename $dir)

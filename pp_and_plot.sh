@@ -10,7 +10,7 @@ esac
 if [ $# -ne 2 ]
 then
     echo "Usage: $0 <preprocessed data dir> <num gpus used>" 
-done
+fi
 
 datadir=$1
 num_gpus=$2
