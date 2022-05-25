@@ -13,7 +13,7 @@ def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%
     pid_names_file = os.path.join(data_dir, "pids.json")
 
     if not os.path.isfile(pid_names_file):
-        print(f"ERROR: Missing pids.json file!")
+        print(f"ERROR: Missing pids.json file in {data_dir}")
         exit(-1) 
 
     pid_names = open(pid_names_file, 'r')
