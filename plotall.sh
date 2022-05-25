@@ -3,6 +3,7 @@
 if [ $# -ne 1 ]
 then
     echo "Usage: $0 <data dir>" 
+    exit -1
 fi
 
 dir=$1
