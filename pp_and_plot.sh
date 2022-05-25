@@ -16,8 +16,10 @@ fi
 datadir=$1
 num_gpus=$2
 expname=$(basename $1)
+# extrace 'data/' since we'll be moving into it
+datadir_relative=${datadir#data/}
 
 pushd data
-./preprocess_traces.sh $datadir $num_gpus
+./preprocess_traces.sh $datadir_relative $num_gpus
 popd
 ${py} timeline.py $datadir $expname
