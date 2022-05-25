@@ -17,5 +17,7 @@ datadir=$1
 num_gpus=$2
 expname=$(basename $1)
 
-./data/preprocess_traces.sh $datadir $num_gpus
+pushd data
+./preprocess_traces.sh $datadir $num_gpus
+popd
 ${py} timeline.py $datadir $expname
