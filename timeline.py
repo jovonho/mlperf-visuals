@@ -42,173 +42,173 @@ def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%
         sharex=True,
     )
 
-    # #
-    # # Plot CPU
-    # #
-    # df = pd.read_csv(
-    #     os.path.join(data_dir, "cpu_data/cpu_all.csv"),
-    #     sep=",",
-    # )
-    # df["timestamp"] = pd.to_datetime(df["timestamp"])
-    # if start is not None:
-    #     df = df[df["timestamp"] >= np.datetime64(start)]
-    # if end is not None:
-    #     df = df[df["timestamp"] <= np.datetime64(end)]
+    #
+    # Plot CPU
+    #
+    df = pd.read_csv(
+        os.path.join(data_dir, "cpu_data/cpu_all.csv"),
+        sep=",",
+    )
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    if start is not None:
+        df = df[df["timestamp"] >= np.datetime64(start)]
+    if end is not None:
+        df = df[df["timestamp"] <= np.datetime64(end)]
 
-    # ax = axs[0]
-    # ax.set_title("CPU Usage")
-    # ax.set_ylabel("percent utilisation(%)")
+    ax = axs[0]
+    ax.set_title("CPU Usage")
+    ax.set_ylabel("percent utilisation(%)")
 
-    # # There are more fields available but weren't very interesting
-    # variables = [
-    #     "%usr",
-    #     "%sys",
-    #     "%iowait",
-    #     "%idle",
-    # ]
+    # There are more fields available but weren't very interesting
+    variables = [
+        "%usr",
+        "%sys",
+        "%iowait",
+        "%idle",
+    ]
 
-    # n_features = len(variables)
+    n_features = len(variables)
 
-    # cm = plt.get_cmap("gist_rainbow")  # Colormap
+    cm = plt.get_cmap("gist_rainbow")  # Colormap
 
-    # for i, var in enumerate(variables):
-    #     line = ax.plot(df["timestamp"], df[var], label=var, linewidth=1)
-    #     line[0].set_color(cm(1 * i / n_features))
+    for i, var in enumerate(variables):
+        line = ax.plot(df["timestamp"], df[var], label=var, linewidth=1)
+        line[0].set_color(cm(1 * i / n_features))
 
-    # ax.grid(True, which="both", linestyle="--", color="grey", alpha=0.2)
-    # ax.tick_params(which="both", direction="in")
+    ax.grid(True, which="both", linestyle="--", color="grey", alpha=0.2)
+    ax.tick_params(which="both", direction="in")
 
-    # ax.set_ylim(ymin=0)
-    # ax.legend(bbox_to_anchor=(1, 0.5), loc="center left")
+    ax.set_ylim(ymin=0)
+    ax.legend(bbox_to_anchor=(1, 0.5), loc="center left")
 
-    # #
-    # # Plot GPU
-    # #
-    # df = pd.read_csv(os.path.join(data_dir, "gpu_data/gpu_avg.csv"), sep=",")
-    # df["timestamp"] = pd.to_datetime(df["timestamp"])
+    #
+    # Plot GPU
+    #
+    df = pd.read_csv(os.path.join(data_dir, "gpu_data/gpu_avg.csv"), sep=",")
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-    # if start is not None:
-    #     df = df[df["timestamp"] >= np.datetime64(start)]
-    # if end is not None:
-    #     df = df[df["timestamp"] <= np.datetime64(end)]
+    if start is not None:
+        df = df[df["timestamp"] >= np.datetime64(start)]
+    if end is not None:
+        df = df[df["timestamp"] <= np.datetime64(end)]
 
-    # ax1 = axs[1]
-    # ax1.set_title("GPU Usage")
-    # ax1.set_ylabel("percent utilisation(%)")
+    ax1 = axs[1]
+    ax1.set_title("GPU Usage")
+    ax1.set_ylabel("percent utilisation(%)")
 
-    # ax1.plot(
-    #     df["timestamp"],
-    #     df["sm"],
-    #     label="GPU MultiProcessor Use (%)",
-    #     color="tab:red",
-    #     linewidth=1,
-    #     markersize=5,
-    # )
-    # ax1.plot(
-    #     df["timestamp"],
-    #     df["mem"],
-    #     label="GPU Memory Use (%)",
-    #     color="tab:orange",
-    #     linewidth=1,
-    #     markersize=5,
-    # )
+    ax1.plot(
+        df["timestamp"],
+        df["sm"],
+        label="GPU MultiProcessor Use (%)",
+        color="tab:red",
+        linewidth=1,
+        markersize=5,
+    )
+    ax1.plot(
+        df["timestamp"],
+        df["mem"],
+        label="GPU Memory Use (%)",
+        color="tab:orange",
+        linewidth=1,
+        markersize=5,
+    )
 
-    # ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+    ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
-    # ax2.set_ylabel("Size (MB)")
-    # ax2.plot(
-    #     df["timestamp"],
-    #     df["fb"],
-    #     label="Framebuffer memory use (MB)",
-    #     color="tab:blue",
-    #     linewidth=1.5,
-    #     markersize=5,
-    # )
+    ax2.set_ylabel("Size (MB)")
+    ax2.plot(
+        df["timestamp"],
+        df["fb"],
+        label="Framebuffer memory use (MB)",
+        color="tab:blue",
+        linewidth=1.5,
+        markersize=5,
+    )
 
-    # ax1.grid(True, which="both", linestyle="--")
-    # ax1.tick_params(which="both", direction="in", grid_color="grey", grid_alpha=0.2)
+    ax1.grid(True, which="both", linestyle="--")
+    ax1.tick_params(which="both", direction="in", grid_color="grey", grid_alpha=0.2)
 
-    # ax1.set_ylim(ymin=0)
-    # ax2.set_ylim(ymin=0)
+    ax1.set_ylim(ymin=0)
+    ax2.set_ylim(ymin=0)
 
-    # ax1.legend(loc="center left")
-    # ax2.legend(loc="center right")
-
-
-    # #
-    # # Plot PIDs
-    # #
-    # for i, pid in enumerate(pids):
-    #     print(f"Processing pid {pid}")
-
-    #     df = pd.read_csv(
-    #         os.path.join(data_dir, f"st_end_data/st_end_data_{pid}"), names=["start_date", "end_date", "event"]
-    #     )
-    #     df = df[["start_date", "end_date", "event"]]
-    #     df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
-    #     df.end_date = pd.to_datetime(df.end_date).astype(np.datetime64)
-
-    #     if start is not None:
-    #         df = df[df["start_date"] >= np.datetime64(start)]
-    #     if end is not None:
-    #         df = df[df["end_date"] <= np.datetime64(end)]
-
-    #     # Can't define this earlier
-    #     masks = {
-    #         "BIO": (df["event"] == "BIOR") | (df["event"] == "BIOW"),
-    #         "OPEN": (df["event"] == "OPENAT") ,
-    #         "R/W": (df["event"] == "READ") | (df["event"] == "WRITE"),
-    #     }
-
-    #     ax = axs[i + 2]
-    #     if pid in pid_names:
-    #         ptitle = pid_names[pid] 
-    #     else:
-    #         ptitle = pid
-
-    #     ax.set_title(f"{ptitle}")
-
-    #     # Plot the events
-    #     for j, category in enumerate(categories):
-    #         mask = masks[category]
-    #         start_dates = mdates.date2num(df.loc[mask].start_date)
-    #         end_dates = mdates.date2num(df.loc[mask].end_date)
-    #         durations = end_dates - start_dates
-    #         xranges = list(zip(start_dates, durations))
-    #         ymin = ymins[j] - 0.5
-    #         yrange = (ymin, bar_height)
-    #         colors = [colors_dict[event] for event in df.loc[mask].event]
-    #         ax.broken_barh(xranges, yrange, facecolors=colors, alpha=1)
-
-    #     ax.spines["top"].set_visible(False)
-    #     ax.spines["right"].set_visible(False)
-    #     ax.spines["left"].set_visible(False)
-
-    #     ax.grid(True, axis="both", linestyle="--", linewidth=0.45, alpha=0.2, color="grey")
-    #     ax.tick_params(which="both", direction="in")
-
-    #     # Format the y-ticks
-    #     ax.set_yticks(range(len(categories)))
-    #     ax.set_yticklabels(categories)
-
-    #     # Add the legend
-    #     if i == 3:
-    #         patches = [
-    #             mpatches.Patch(color=color, label=key) for (key, color) in colors_dict.items()
-    #         ]
-    #         ax.legend(handles=patches, bbox_to_anchor=(1, 0.5), loc="center left")
+    ax1.legend(loc="center left")
+    ax2.legend(loc="center right")
 
 
-    # # Set the x axis limits
-    # # We do this here so that we create a margin around the trace data min/max vs. the timeline
-    # # data which we care less about. This makes the start/end setting work more as expected.
-    # if margin is None:
-    #     margin = np.timedelta64(5, "s")
+    #
+    # Plot PIDs
+    #
+    for i, pid in enumerate(pids):
+        print(f"Processing pid {pid}")
 
-    # ax.set_xlim(
-    #     df.start_date.min() - margin,
-    #     df.end_date.max() + margin,
-    # )
+        df = pd.read_csv(
+            os.path.join(data_dir, f"st_end_data/st_end_data_{pid}"), names=["start_date", "end_date", "event"]
+        )
+        df = df[["start_date", "end_date", "event"]]
+        df.start_date = pd.to_datetime(df.start_date).astype(np.datetime64)
+        df.end_date = pd.to_datetime(df.end_date).astype(np.datetime64)
+
+        if start is not None:
+            df = df[df["start_date"] >= np.datetime64(start)]
+        if end is not None:
+            df = df[df["end_date"] <= np.datetime64(end)]
+
+        # Can't define this earlier
+        masks = {
+            "BIO": (df["event"] == "BIOR") | (df["event"] == "BIOW"),
+            "OPEN": (df["event"] == "OPENAT") ,
+            "R/W": (df["event"] == "READ") | (df["event"] == "WRITE"),
+        }
+
+        ax = axs[i + 2]
+        if pid in pid_names:
+            ptitle = pid_names[pid] 
+        else:
+            ptitle = pid
+
+        ax.set_title(f"{ptitle}")
+
+        # Plot the events
+        for j, category in enumerate(categories):
+            mask = masks[category]
+            start_dates = mdates.date2num(df.loc[mask].start_date)
+            end_dates = mdates.date2num(df.loc[mask].end_date)
+            durations = end_dates - start_dates
+            xranges = list(zip(start_dates, durations))
+            ymin = ymins[j] - 0.5
+            yrange = (ymin, bar_height)
+            colors = [colors_dict[event] for event in df.loc[mask].event]
+            ax.broken_barh(xranges, yrange, facecolors=colors, alpha=1)
+
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+
+        ax.grid(True, axis="both", linestyle="--", linewidth=0.45, alpha=0.2, color="grey")
+        ax.tick_params(which="both", direction="in")
+
+        # Format the y-ticks
+        ax.set_yticks(range(len(categories)))
+        ax.set_yticklabels(categories)
+
+        # Add the legend
+        if i == 3:
+            patches = [
+                mpatches.Patch(color=color, label=key) for (key, color) in colors_dict.items()
+            ]
+            ax.legend(handles=patches, bbox_to_anchor=(1, 0.5), loc="center left")
+
+
+    # Set the x axis limits
+    # We do this here so that we create a margin around the trace data min/max vs. the timeline
+    # data which we care less about. This makes the start/end setting work more as expected.
+    if margin is None:
+        margin = np.timedelta64(5, "s")
+
+    ax.set_xlim(
+        df.start_date.min() - margin,
+        df.end_date.max() + margin,
+    )
 
 
     #
