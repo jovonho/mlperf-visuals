@@ -1,4 +1,5 @@
 import json
+import code
 import os.path
 import pathlib
 import argparse
@@ -7,8 +8,19 @@ import pandas as pd
 from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colors
 
 
-def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None, xformat="%H:%M", margin=np.timedelta64(60, "s"), filename=None):
+def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%H:%M", margin=np.timedelta64(60, "s"), filename=None):
+
+    pid_names_file = os.path.join(data_dir, "pids.json")
+
+    if not os.path.isfile(pid_names_file):
+        print(f"ERROR: Missing pids.json file!")
+        exit(-1) 
+
+    pid_names = open(pid_names_file, 'r')
+    pid_names = json.load(pid_names)
     pids = list(pid_names.keys())
+
+
     bar_height = 1
     ymins = [0, 1, 2]
     categories = ["BIO", "R/W", "OPEN"]
@@ -244,7 +256,7 @@ def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None,
     categories = ["Timeline"]
 
     ymins = [0]
-    colors_dict = dict(INIT="blue", FIRST_EPOCH="crimson", EPOCH="gold", EVAL="darkorchid")
+    colors_dict = dict(INIT="blue", EPOCH="gold", EVAL="darkorchid")
 
     # Select the last axes
     ax = axs[-1]
@@ -259,7 +271,7 @@ def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None,
         yrange = (ymin, bar_height)
         colors = [colors_dict[event] for event in df.event]
         # Plot vertical lines delimiting epoch starts
-        ax.vlines(x=start_dates, ymin=ymin, ymax=0.5, color='k', linewidth=0.5)
+        ax.vlines(x=start_dates, ymin=ymin, ymax=0.5, color='k', linewidth=0.25)
         ax.broken_barh(xranges, yrange, facecolors=colors, alpha=0.8)
         # you can set alpha to 0.6 to check if there are some overlaps
 
@@ -285,7 +297,6 @@ def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None,
     ax.grid(True, axis="x", linestyle="--", linewidth=0.45, alpha=0.2, color="grey")
     ax.tick_params(axis="x", which="both", direction="out", rotation=30)
 
-    print("Saving figure")
 
     fig.suptitle(title)
 
@@ -298,36 +309,72 @@ def plot_pids_timeline_cpu_gpu(data_dir, pid_names, title, start=None, end=None,
     output_dir = os.path.dirname(filename)
     pathlib.Path(os.path.join("./plots/", output_dir)).mkdir(parents=True, exist_ok=True)
 
+    print(f"Saving figure to plots/{filename}")
     plt.savefig(f"./plots/{filename}", format="png", dpi=500)
+
+
+
+def get_plotting_ranges(data_dir):
+
+    df = pd.read_csv(os.path.join(data_dir, "mllog_data/timeline.csv"), names=["start_date", "end_date", "event"])
+
+    init = df.iloc[0]
+    first_epoch = df[df["event"] == "EPOCH"].iloc[0]
+    first_eval = df[df["event"] == "EVAL"].iloc[0]
+    last_event = df.iloc[-1]
+
+    td_5s = np.timedelta64(5, 's')
+    td_30s = np.timedelta64(30, 's')
+    td_2min = np.timedelta64(2, 'm')
+    td_5min = np.timedelta64(5, 'm')
+
+    interesting_time_ranges = {
+        "init": (np.datetime64(init.start_date), np.datetime64(init.end_date)),
+        "first_30s": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_30s),
+        "first_5min": (np.datetime64(init.start_date), np.datetime64(init.start_date) + td_5min),
+        "first_epoch": (np.datetime64(first_epoch.start_date) - td_5s, np.datetime64(first_epoch.end_date) + td_5s),
+        "first_eval": (np.datetime64(first_eval.start_date) - td_5s, np.datetime64(first_eval.end_date) + td_5s),
+        "last_2min": (np.datetime64(last_event.end_date) - td_2min, np.datetime64(last_event.end_date)),
+        "last_5s": (np.datetime64(last_event.end_date) - td_5s, np.datetime64(last_event.end_date)),
+    }
+
+    # code.interact(local=locals())
+
+    return interesting_time_ranges
 
 
 if __name__ == "__main__":
 
-    # TODO: Automate this process. Would need to extract relevant PIDs from the many that show up
-    # and find a way to ID which is which. Else this will remain manual.
-    # Even better: use the output of ps aux to ID which is the master and which are the 
-
-    p = argparse.ArgumentParser(description="Create the overall timeline plot for a given run")
+    p = argparse.ArgumentParser(description="Create the timeline plots for a given run")
     p.add_argument("data_dir", help="Directory where the preprocessed traces are")
-    p.add_argument("pid_names", help="JSON file containing the PID->Name mappings")
-    p.add_argument("filename", help="Output filename (will be PNG file) - will be created in './plots' folder relative to this script")
-    p.add_argument("title", help="Title of the plot")
+    p.add_argument("experiment_name", help="Title of the plot")
     args = p.parse_args()
 
     if not os.path.isdir(args.data_dir):
         print(f"ERROR: Invalid trace directory")
         exit(-1) 
 
-    if not os.path.isfile(args.pid_names):
-        print(f"ERROR: PID to Name mapping file invalid!")
-        exit(-1) 
-
-    pid_names = open(args.pid_names, 'r')
-    pid_names = json.load(pid_names)
-
     plot_pids_timeline_cpu_gpu(
         args.data_dir,
-        pid_names,
-        title=args.title,
-        filename=args.filename,
+        title=args.experiment_name,
+        filename=f"timelines/{args.experiment_name}/overview.png",
     )
+
+    # Extract times of first epoch, first eval, first 5 min and last 5 minutes from the mllog file
+    interesting_time_ranges = get_plotting_ranges(args.data_dir)
+
+    for name, time_range in interesting_time_ranges.items():
+
+        start = time_range[0]
+        end = time_range[1]
+
+        plot_pids_timeline_cpu_gpu(
+            args.data_dir,
+            title=f"{args.experiment_name} - {name}",
+            start=start,
+            end=end,
+            xformat="%H:%M:%S",
+            margin=np.timedelta64(1, "s"),
+            filename=f"timelines/{args.experiment_name}/{name}.png",
+        )
+

@@ -33,19 +33,3 @@ sed -i '$ d' $output_dir/timeline.log
 awk 'BEGIN { print "[" } { print $0"," }' $output_dir/timeline.log > tmp && mv tmp $output_dir/timeline.log
 # Remove last comma, make valid JSON array
 sed -i '$ s/.$/\n]/' $output_dir/timeline.log
-
-# Extract just the eval accuracies
-grep -a "eval_accuracy" $output_dir/u.log > $output_dir/evals.log
-# Remove useless fields
-awk -F ', ' 'BEGIN {OFS= ", "; ORS="\n"} {print $1,$2,$3,$4,$7}' $output_dir/evals.log > tmp && mv tmp $output_dir/evals.log
-sed -i 's/}}/}/' $output_dir/evals.log
-
-# Convert to valid JSON array
-awk 'BEGIN { print "[" } { print $0"," }' $output_dir/evals.log > tmp && mv tmp $output_dir/evals.log
-sed -i '$ s/.$/\n]/' $output_dir/evals.log
-
-# Extract all other info
-grep -E -v "init_start|init_stop|run_start|run_stop|block_start|block_stop|epoch_start|epoch_stop|eval_start|eval_accuracy|eval_stop" $output_dir/u.log > $output_dir/other_info.log
-awk 'BEGIN { print "[" } { print $0"," }' $output_dir/other_info.log > tmp && mv tmp $output_dir/other_info.log
-sed -i '$ s/.$/\n]/' $output_dir/other_info.log
-

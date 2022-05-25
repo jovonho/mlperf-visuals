@@ -11,7 +11,7 @@ esac
 
 if [ $# -lt 2 ]
 then
-    echo "Usage: $0 traces_dir output_dir num_gpus"
+    echo "Usage: $0 traces_dir num_gpus"
     exit -1
 fi
 
@@ -30,6 +30,7 @@ num_gpus=$2
 ${py} align_time.py $traces_dir $ta_outdir
 
 # Check for integer overflows in the read trace
+# Should not happen anymore since the traces were fixed at the source
 if [[ $(grep -a "\s+\-[0-9]\s+" ${ta_outdir}/read_time_aligned.out) ]]
 then 
     echo "Found some large negative values in the read() trace."
@@ -37,7 +38,13 @@ then
     ${py} vfsrw_bugfix.py $ta_outdir/read_time_aligned.out
 fi
 
+# Extract PIDs and their human readable names
+${py} pid_names.py $traces_dir $ta_outdir
+
+# Split the traces by PID
 ./split_traces_by_pid.sh $ta_outdir
+
+# Extract timeline information and transform data for timeline plotting
 ./prepare_traces_for_timelines.sh $ta_outdir
 
 # Process the CPU and GPU traces
@@ -45,7 +52,7 @@ fi
 ./gpu.sh $traces_dir/gpu.out $ta_outdir 
 ${py} cpu_gpu.py $ta_outdir/gpu_data/gpu.all $ta_outdir/cpu_data/cpu.all $num_gpus
 
-# Process the app log
+# Process the app log for timeline plotting
 ./mllog.sh $traces_dir/unet3d.log $ta_outdir
 ${py} mllog_UNIX_to_UTC_ts.py $ta_outdir/mllog_data/
 
