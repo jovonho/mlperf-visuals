@@ -221,9 +221,9 @@ def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%
     df.end_date = pd.to_datetime(df.end_date).astype(np.datetime64)
 
     if start is not None:
-        df = df[df["start_date"] > np.datetime64(start)]
+        df = df[df["start_date"] >= np.datetime64(start)]
     if end is not None:
-        df = df[df["end_date"] < np.datetime64(end)]
+        df = df[df["end_date"] <= np.datetime64(end)]
 
     # Add synthetic data to show timeline info when no data point is included in the desired range
     # Uncomment/modify according to needs
