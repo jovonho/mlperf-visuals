@@ -10,6 +10,8 @@ from matplotlib import dates as mdates, pyplot as plt, patches as mpatches, colo
 
 def plot_pids_timeline_cpu_gpu(data_dir, title, start=None, end=None, xformat="%H:%M", margin=np.timedelta64(60, "s"), filename=None):
 
+    print(f"Generating plot {title}")
+
     pid_names_file = os.path.join(data_dir, "pids.json")
 
     if not os.path.isfile(pid_names_file):
