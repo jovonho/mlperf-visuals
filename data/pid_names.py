@@ -23,7 +23,7 @@ def main(data_dir, output_dir):
     if run_method is None:
         run_method = "launch.py"
 
-    print(run_method)
+    print(f"Found evidence that the run_method was {run_method}.\nExtracting PID info appropriately.")
     pid_names = {}
 
     pids_trace.seek(0)
@@ -67,7 +67,7 @@ def main(data_dir, output_dir):
             else:
                 continue
     
-    print(pid_names)
+    print(f"Extracted PID information:\n{json.dumps(pid_names, indent=2)}\n")
 
     outfile = os.path.join(output_dir, "pids.json")
     outfile = open(outfile, 'w')
@@ -80,6 +80,11 @@ def main(data_dir, output_dir):
         justpidsfile.write(f"{pid}\n")
                 
 if __name__ == "__main__":
+
+    print('#####################################################')
+    print("pid_names.py: Extracting PID information from traces")
+    print('#####################################################\n')
+
     p = argparse.ArgumentParser(description="Extract relevant PIDs and their names from pids_tids.out")
     p.add_argument("data_dir", help="Raw traces directory")
     p.add_argument("output_dir", help="output directory")
@@ -93,3 +98,5 @@ if __name__ == "__main__":
         pathlib.Path(args.data_dir).mkdir(exist_ok=True, parents=True)
     
     main(args.data_dir, args.output_dir)
+
+    print("All done\n")

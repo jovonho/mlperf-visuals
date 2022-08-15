@@ -62,7 +62,7 @@ def process_vals():
 
 
 if __name__ == "__main__":
-    p = argparse.ArgumentParser(description="Changes the UNIX timestmap in the mllog to a UTC timestamp")
+    p = argparse.ArgumentParser(description="Changes the UNIX timestamp in the mllog to a UTC timestamp")
     p.add_argument("datadir", help="directory where processed unet3d.log is found")
     args = p.parse_args()
 

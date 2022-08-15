@@ -17,7 +17,7 @@ fi
 
 output_dir=$output_dir/mllog_data
 
-# Remove ":::MLLOG" prefix from all ligns
+# Remove ":::MLLOG" prefix from all lines
 sed 's/:::MLLOG //' $logfile > $output_dir/u.log
 
 # Remove empty namespace field
@@ -33,3 +33,5 @@ sed -i '$ d' $output_dir/timeline.log
 awk 'BEGIN { print "[" } { print $0"," }' $output_dir/timeline.log > tmp && mv tmp $output_dir/timeline.log
 # Remove last comma, make valid JSON array
 sed -i '$ s/.$/\n]/' $output_dir/timeline.log
+
+echo -e "All done\n"

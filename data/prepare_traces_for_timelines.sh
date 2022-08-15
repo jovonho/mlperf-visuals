@@ -60,3 +60,5 @@ done < $outdir/pids
 
 # Cleanup
 rm $outdir/bio_tmp $outdir/open_tmp $outdir/read_tmp $outdir/write_tmp
+
+echo -e "\nAll done\n"

@@ -301,6 +301,9 @@ def plot_pids_timeline_cpu_gpu(pid_names, title, start=None, end=None, xformat="
 
 if __name__ == "__main__":
 
+    print("This is the old version of the timeline plotting script. Please use timeline.py instead.\n")
+    exit(0)
+
     DATA_DIR = "data/ta_4gpu_1xRAM_ref"
 
     # TODO: Automate this process. Would need to extract relevant PIDs from the many that show up

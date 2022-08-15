@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script will preprocess and plot raw traces data
+
 # Determine which python command to use depending on platform 
 unameOut="$(uname -s)"
 case "${unameOut}" in
@@ -9,7 +11,7 @@ esac
 
 if [ $# -ne 2 ]
 then
-    echo "Usage: $0 <preprocessed data dir> <num gpus used>" 
+    echo "Usage: $0 <raw data dir> <num gpus used>" 
     exit -1
 fi
 
@@ -19,6 +21,7 @@ expname=$(basename $datadir)
 datadirname=$(dirname $datadir)
 # extrace 'data/' since we'll be moving into it
 datadir_relative=${datadir#data/}
+echo "Datadir relative $datadir_relative"
 
 ta_dir=$datadirname/ta_$expname
 

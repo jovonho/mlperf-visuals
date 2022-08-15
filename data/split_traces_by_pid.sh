@@ -58,3 +58,5 @@ while read pid; do
 
 
 done < $datadir/pids
+
+echo -e "\nAll done\n"

@@ -5,9 +5,15 @@ import numpy as np
 import argparse
 
 # Add any new trace we want to time align here
-TRACES = ["openat", "close", "read", "write", "mmap", "create_del", "bio"]
+TRACES = ["openat", "close", "read", "write", "create_del", "bio"]
 
-
+"""
+This function reads the time align trace and looks at every seconds transition
+that was captured. It looks at the difference between the nsecs timestamp before and after
+these transition and finds the minimum one.
+Using the nsecs timestamps with minimal difference, it takes their midpoint and aligns it
+with the given second in localtime. 
+"""
 def get_ref_ts(timealign_trace, gpu_trace):
 
     timealign_trace = open(timealign_trace, "r")
@@ -53,12 +59,10 @@ def get_ref_ts(timealign_trace, gpu_trace):
 
             prev_ts = ts
 
-    print(f"Min timestamp diff is {min_ts_diff} ns between {min_lt_0} and {min_lt_1}")
+    print(f"\nMin timestamp diff is {min_ts_diff} ns between {min_lt_0} and {min_lt_1}")
 
     ref_ts = int(min_ts_1) - (min_ts_diff // 2)
     ref_lt = min_lt_1
-
-    print(f"We'll say ts {ref_ts} corresponds to {ref_lt}.000000000")
 
     # Try to get the date from the GPU trace
     gpu_trace = open(gpu_trace, "r")
@@ -69,45 +73,54 @@ def get_ref_ts(timealign_trace, gpu_trace):
     for line in gpu_trace:
         if match := pat.match(line):
             localdate = match.group(1)
-            print(f"Found the local date in gpu trace: {localdate}")
+            print(f"Found the local date in gpu trace: {localdate}\n")
             break
 
     # Gpu trace localdate is in YYYYMMDD, break it into YYYY-MM-DD
     utc_str = f"{localdate[0:4]}-{localdate[4:6]}-{localdate[6:]}T{ref_lt}.000000000"
     ref_UTC = np.datetime64(utc_str)
-    print(ref_UTC)
+    print(f"Alignment DONE: {ref_ts} corresponds to {ref_UTC}\n")
 
     return ref_ts, ref_UTC
 
+# Read a line and revert the file pointer 
+def peek_line(f):
+    pos = f.tell()
+    line = f.readline()
+    f.seek(pos)
+    return line
 
+"""
+Once we have estimated the matching between nsecs timestamp and local time, we can  
+convert the timestamps to UTC to be able to align them with data from other sources.
+"""
 def align_all_traces(traces_dir, output_dir, ref_ts, ref_t):
+
+    print("Aligning all traces:")
 
     # Add 5 hours to convert to UTC (we are in Montreal time)
     ref_t = ref_t + np.timedelta64(5, "h")
 
     for trace in TRACES:
 
-        print(f"Processing {trace}")
+        print(f"\tProcessing {trace}")
 
-        infile = open(os.path.join(traces_dir, "trace_" + trace + ".out"), "r")
+        tracefile = open(os.path.join(traces_dir, "trace_" + trace + ".out"), "r")
         outfile = open(os.path.join(output_dir, trace + "_time_aligned.out"), "w")
 
-        # Discard the first 2 lines of traces
-        for _ in range(2):
-            infile.readline()
+        # The traces have some lines at the start where we print out columns or other info
+        # We want to skip those as they don't contain useful information
+        regex_start_w_number = re.compile(r'^[0-9].*')
 
-        # Discard 3 more lines for mmap trace
-        if trace == "mmap":
-            for _ in range(3):
-                infile.readline()
-
-        # Discard 5 more lines for create_del trace
-        if trace == "create_del":
-            for _ in range(5):
-                infile.readline()
+        while True:
+            line = peek_line(tracefile)
+            if re.match(regex_start_w_number, line) is None:
+                tracefile.readline()
+            else:
+                break
         
         try:
-            for line in infile:
+            for line in tracefile:
                 cols = " ".join(line.split()).split(" ")
                 # Handle empty lines
                 if cols[0] == "":
@@ -120,12 +133,16 @@ def align_all_traces(traces_dir, output_dir, ref_ts, ref_t):
                 t = ref_t + ts_delta
                 outfile.write(np.datetime_as_string(t) + " " + " ".join(cols[1::]) + "\n")
         except Exception as e:
-            print(f"Error while processing trace_{trace}")
+            print(f"\tError while processing trace_{trace}! Continuing.")
             print(e)
             continue
 
 
 if __name__ == "__main__":
+
+    print('#########################################################################')
+    print("align_time.py: Converting bpftrace's 'nsecs since boot' timestamps to UTC")
+    print('#########################################################################\n')
 
     p = argparse.ArgumentParser(description="Convert bpftrace's 'nsecs since boot' timestamps to a UTC")
     p.add_argument("traces_dir", help="Directory where raw traces are")
@@ -136,13 +153,16 @@ if __name__ == "__main__":
         print(f"ERROR: Invalid trace directory {args.traces_dir}")
         exit(-1) 
 
+    if not os.path.isdir(args.output_dir):
+        print(f"Creating output directory {args.output_dir}")
+        pathlib.Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+
     time_align_trace = os.path.join(args.traces_dir, "trace_time_align.out")
     if not os.path.isfile(time_align_trace):
         print(f"ERROR: Could not find trace_time_align.out in {args.traces_dir}.")
         exit(-1) 
 
     gpu_trace = os.path.join(args.traces_dir, "gpu.out")
-    print(gpu_trace)
     if not os.path.isfile(gpu_trace):
         print(f"ERROR: Could not find gpu.out in {args.traces_dir}")
         exit(-1) 
@@ -150,3 +170,4 @@ if __name__ == "__main__":
     ref_ts, ref_UTC = get_ref_ts(time_align_trace, gpu_trace)
     align_all_traces(args.traces_dir, args.output_dir, ref_ts, ref_UTC)
 
+    print("All done\n")

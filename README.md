@@ -1,4 +1,47 @@
 
+
+# Preprocessing the raw data
+
+Note: this code was written specifcally for the image segmentation traces and logs. It WILL need to be adapted to visualize other workloads, esp. DLIO. 
+
+The main steps in adapting this code to other workloads will be in parsing the different application log and outputting correct events (i.e. epoch start, epoch end, etc.) and understanding which PIDs to plot and what they correspond to. Read below to understand where those changes should be made.
+
+## Generate plot from the test data
+
+There are some real traces in `data/4gpu_test_data.tar.gz` so you can generate the plots for it and understand the codebase.
+After uncompressing the data and placing the resulting folder in `data/`:
+
+1) Navigate inside the `data` directory then run `preprocess_traces.sh` with the correct arguments. There are some path issues if you try running the script from elsewhere.
+This will prepare the raw data for plotting into a timeline visualization.
+
+2) From the root directory, run `timeline.py` to generate the plots. The script will read the event information and generate an overview plot as well as zooms into various points of interest.
+
+3) The plotting script will crash with an error that you will have to fix as an exercise ;). These happen often as the traces don't always have perfectly formatted output / weird things happen.
+
+## Proprocessing pipeline steps
+
+`preprocess_traces.sh` launches the following scripts in sequence:
+1. `align_time.py` goes through the time alignment trace to estimate an alignment of bpftrace 'nsecs since boot' timestamps to UTC time, and rewrites the traces with UTC timestamps.
+2. `pid_names.py` parses the PID trace to generate a map of `PID -> name` for plotting. This script was used for plotting image segmentation and is specific to pytorch and the different ways to launch that workload on multiple GPUs. **This will have to be modified to plot the other workloads and DLIO, and will require some analysis first to understand which processes do what**.
+3. `split_traces_by_pid.sh` splits the traces, creating one for each PID. 
+4. `prepare_traces_for_timelines.sh` for each PID, combines the read, write, open and bio traces, keeping only necessary fields and calls `ts_to_start_end.py` to convert the trace format from `<start timestamp> <event> <duration>` to `<start timestamp> <end timestamp> <event>` . 
+5. `cpu.sh`, `gpu.sh` and `cpu_gpu.py` which process the CPU and GPU traces, extracting only the 'all' line of the CPU trace and calculating the average of all GPUs. 
+6. `mllog.sh` and `mllog_UNIX_to_UTC_ts.py` which clean up the image segmentation app log and output a `<start timestamp> <end timestamp> <event>` formatted trace of important logical events of training (initialization, epoch start and end, evaluation), converting unix timestamps of the app logs to UTC. **These scripts will also need to be modified and adapted to other workloads as the application log might be structured differently/have different logical events. DLIO will even need to be modified to output some timestamped log as it does not do so currently.** 
+
+
+There are other processing scripts to plot histograms and various utilities that can be useful for you to discover.
+
+<br>
+
+### Adding a new trace
+
+If you define a new trace, you must add it to the TRACES array at the start of `align_time.py` and extend the various scripts under `data` to account for it during preprocessing.
+
+
+<br>
+
+### Old documentation
+----------------------
 There are many different scripts in here that need to be run in a specific order to work.
 
 The main plotting ones are in the root directory, but we first need to run the preprocessing ones in the `data/` folder.

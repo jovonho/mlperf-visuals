@@ -141,6 +141,7 @@ if __name__ == "__main__":
     current_date = get_date(args.gpu_trace)
     process_cpu_data(args.cpu_trace, current_date)
 
+    print("All done\n")
 
 
 
